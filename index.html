@@ -190,6 +190,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 #result h2{ font-family:var(--font-display); font-weight:800; font-size:38px; letter-spacing:.2em; margin:0 0 12px; }
 #result .stats{ font-size:15px; line-height:1.9; color:var(--moon); margin-bottom:20px; text-align:center; }
 .row2{ display:flex; gap:10px; }
+.btn.warn{ border-color:#e8695e; color:#ffb4aa; }
 .btn{ padding:11px 20px; border-radius:4px; border:1px solid var(--kin); background:rgba(13,18,33,.9); font-weight:700; font-size:15px; }
 .btn:active{ background:rgba(216,180,90,.2); }
 
@@ -287,7 +288,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 
   <section id="pause" class="screen hide">
     <h2 style="font-family:var(--font-display);letter-spacing:.2em;margin:0 0 16px">一時停止</h2>
-    <div class="row2"><button class="btn" id="bResume">再開</button><button class="btn" id="bSet2">設定</button><button class="btn" id="bQuit">タイトルへ</button></div>
+    <div class="row2"><button class="btn" id="bResume">再開</button><button class="btn" id="bSet2">設定</button><button class="btn" id="bQuit">リタイア</button></div>
   </section>
 
   <section id="result" class="screen hide">
@@ -505,7 +506,7 @@ const SPELLS = {
     lv:[['ダメージ+25%',{d:.25}],['範囲+15%',{a:.15}],['CT-10%',{c:.1}],['ブラックホール+1(6個)',{n:1}]] },
   gekkou:{ n:'月光', ab:'月', hidden:1, only:'tsukuyomi', desc:'自分の周りの月の輪(威力は低いが、長く続く)と、直線4方向の光の筋(威力は高いが、短い)を出す。光の上にいる敵は、継続ダメージを受ける(月詠専用)',
     base:{ dmg:12, cdmg:5, cd:8.5, dur:2.0, cdur:4.3, range:7, len:4.2, w:.7, R:1.5 },
-    lv:[['ダメージ+25%',{d:.25}],['光の筋の長さ+20%',{x:.2}],['CT-10%',{c:.1}],['光の筋が8方向になる、ダメージ+15%',{beams8:1,d:.15}]] },
+    lv:[['ダメージ+25%',{d:.25}],['光の筋の長さ+20%',{x:.2}],['光の筋が5本になる、CT-10%',{beams:5,c:.1}],['光の筋が6本になる、ダメージ+15%',{beams:6,d:.15}]] },
   kawarimi:{ n:'変わり身の術', ab:'身', desc:'敵の攻撃を1度だけ無効化。CT後に再発動',
     base:{ cd:30 },
     lv:[['CT-15%',{c:.15}],['CT-15%',{c:.15}],['CT-15%',{c:.15}],['CT-15%',{c:.15}]] }
@@ -877,6 +878,7 @@ function addXp(v){
 /* ================= 敵の生成 ================= */
 /* ボス系の体力の倍率(ミニボス・中ボス・主) */
 const BOSS_HP = { mini: 2.8, mid: 3.5, final: 4 };
+const WRAP_MARGIN = 2.5;   // 画面の外へ、これだけ離れた敵は、反対側へ回り込む(出現位置の外側1.5マスより外)
 const BOSS_FIGHT_SPAWN = .35;   // 主との戦いの間の、ふつうの敵の出現の倍率
 const FINAL_RAID = 2.2;   // 第5地(最終ステージ)の主は、さらに体力が高い(×2.5)
 const CINE_REVEAL = 9.4, CINE_END = 10.2;   // 暗転の演出: 主が現れる時刻、演出が終わる時刻(秒)
@@ -1249,10 +1251,12 @@ function fireSpell(sp){
       return cd; }
     case 'gekkou': {
       if (!aimTarget(s.range)) return 0;
-      const n = s.beams8 ? 8 : 4, durB = s.dur * s.durMul * gDur(), life = s.cdur * s.durMul * gDur(), cdmgBase = (s.cdmg || 0) * s.dmgMul * gSDmg();
+      const n = s.beams || 4, durB = s.dur * s.durMul * gDur(), life = s.cdur * s.durMul * gDur(), cdmgBase = (s.cdmg || 0) * s.dmgMul * gSDmg();
       if (fxReady('moonFlash')) fxAt('moonFlash', p.x, p.y, 0, s.R * s.areaMul * ar * 1.05 / FX.moonFlash.k, .5);
-      for (let k = 0; k < times; k++)
-        G.zones.push({ kind:'moon', x: p.x, y: p.y, n, off: k * TAU / (n * 2), R: s.R * s.areaMul * ar, L: s.len * s.rngMul * ar, w: s.w * ar, life, max: life, durB, tickT: 0, dmg: dmgBase * (k ? senjuFactor() : 1), cdmg: cdmgBase * (k ? senjuFactor() : 1) });
+      // 千手の巻: 光の筋(直線)だけが、1組ずつ増える(角度をずらして、等間隔に)。中心の輪は、1つのまま。筋の当たり判定は、1組ごとに独立
+      const offs = [], dmgs = [];
+      for (let k = 0; k < times; k++){ offs.push(k * TAU / (n * times)); dmgs.push(dmgBase * (k ? senjuFactor() : 1)); }
+      G.zones.push({ kind:'moon', x: p.x, y: p.y, n, offs, dmgs, R: s.R * s.areaMul * ar, L: s.len * s.rngMul * ar, w: s.w * ar, life, max: life, durB, tickT: 0, cdmg: cdmgBase });
       return cd; }
     case 'hyoui': {
       if (p.buffT > 0 || !aimTarget(s.range)) return 0;
@@ -1350,7 +1354,10 @@ function updateEnemies(dt){
         const b = G.barrier, bx = e.x - b.x, by = e.y - b.y, bd = Math.hypot(bx, by);
         if (bd > b.r - e.r){ e.x = b.x + bx / bd * (b.r - e.r); e.y = b.y + by / bd * (b.r - e.r); }
       }
-      if (!e.boss && d > rr + 10){ const q = ringPos(rnd(0, 1.5)); e.x = q.x; e.y = q.y; }
+      if (!e.boss && d > rr + WRAP_MARGIN){   // 画面の外へ見切れた敵は、見切れた側の反対側から、回り込んで出てくる
+        const a = Math.atan2(e.y - p.y, e.x - p.x) + Math.PI + rnd(-.3, .3), R = rr + rnd(0, 1.2);
+        e.x = p.x + Math.cos(a) * R; e.y = p.y + Math.sin(a) * R; if (T.dash){ e.st = 0; e.stT = rnd(1.5, 3); }
+      }
       else if (e.boss && !G.barrier && d > rr + 5){   // 離れすぎたボスは、自分をはさんで反対側の、画面の外から、回り込んで出てくる
         const R = rr + .6; e.x = p.x - (e.x - p.x) / d * R; e.y = p.y - (e.y - p.y) / d * R; e.st = 0; e.stT = rnd(1.5, 3);
         G.fx.push({ k:'ring', x: e.x, y: e.y, R: 1.6, life: .45, max: .45, col:'#ff6a5a' });
@@ -1458,14 +1465,17 @@ function updateZones(dt){
         // 自分の周りの月の輪(低威力・長時間)の中は、輪のダメージ。その外の、光の筋(高威力・短時間)の上は、筋のダメージ
         const age = z.max - z.life, beamOn = age < z.durB;
         const dx = e.x - z.x, dy = e.y - z.y, d = Math.hypot(dx, dy);
-        const inC = d <= z.R + e.r; let inB = false;
+        const inC = d <= z.R + e.r; let bd = 0;
         if (!inC && beamOn && d <= z.L + e.r){
-          const step = TAU / z.n, ph = Math.atan2(dy, dx) - z.off, kk = Math.round(ph / step), df = ph - kk * step;
-          const along = d * Math.cos(df), pe = d * Math.abs(Math.sin(df));
-          inB = along >= -e.r && along <= z.L + e.r && pe <= z.w / 2 + e.r;
+          const step = TAU / z.n, a0 = Math.atan2(dy, dx);
+          for (let g = 0; g < z.offs.length; g++){   // 筋の組ごとに、別々に判定する(重なった所では、それぞれのダメージを受ける)
+            const ph = a0 - z.offs[g], kk = Math.round(ph / step), df = ph - kk * step;
+            const along = d * Math.cos(df), pe = d * Math.abs(Math.sin(df));
+            if (along >= -e.r && along <= z.L + e.r && pe <= z.w / 2 + e.r) bd += z.dmgs[g];
+          }
         }
-        if ((inB || inC) && tick){
-          G.noSpark = true; hitEnemy(e, inC ? z.cdmg : z.dmg); G.noSpark = false;
+        if ((bd > 0 || inC) && tick){
+          G.noSpark = true; hitEnemy(e, inC ? z.cdmg : bd); G.noSpark = false;
           if ((G.moonSp | 0) < 8 && fxReady('moonSpark')){ G.moonSp = (G.moonSp | 0) + 1; fxAt('moonSpark', e.x, e.y, 0, .9 / FX.moonSpark.k, .35); }
         }
         continue;
@@ -1521,14 +1531,18 @@ function updateItems(dt){
   const p = G.p, hx = hw(), hy = hh();
   for (let i = G.items.length - 1; i >= 0; i--){
     const it = G.items[i], d = Math.hypot(p.x - it.x, p.y - it.y);
-    if (it.type === 'koban' && d < pickupR() * .8){ it.x += (p.x - it.x) / d * 10 * dt; it.y += (p.y - it.y) / d * 10 * dt; }
+    if (it.type === 'koban'){
+      if ((G.magT || 0) > 0 && Math.abs(p.x - it.x) <= hx * 1.5 && Math.abs(p.y - it.y) <= hy * 1.5) it.mag = true;   // 勾玉の効果中: 画面とその外側の小判を呼ぶ
+      if (it.mag){ it.x += (p.x - it.x) / d * 22 * dt; it.y += (p.y - it.y) / d * 22 * dt; }
+      else if (d < pickupR() * .8){ it.x += (p.x - it.x) / d * 10 * dt; it.y += (p.y - it.y) / d * 10 * dt; }
+    }
     if (d < .9){
       if (it.type === 'onigiri'){ sfxHeal(); p.hp = Math.min(maxHp(), p.hp + maxHp() * (.3 + .03 * bu('heal'))); G.fx.push({ k:'ring', x: p.x, y: p.y, R: 1.2, life: .5, max: .5, col:'#9ad8a0' }); }
       else if (it.type === 'koban'){ G.koban++; G.fx.push({ k:'ring', x: it.x, y: it.y, R: .6, life: .3, max: .3, col:'#e9c35f' }); }
       else {
         for (const s of G.souls){ if (Math.abs(s.x - p.x) <= hx * 1.5 && Math.abs(s.y - p.y) <= hy * 1.5){ s.att = true; s.fast = true; } }
         G.magT = MAGATAMA_SEC; sfxMag();   // 5秒間、新しく落ちた残魂も、呼び続ける(音も5秒)
-        banner('勾玉、5秒間、残魂を呼ぶ', 'good');
+        banner('勾玉、5秒間、残魂と小判を呼ぶ', 'good');
       }
       G.items[i] = G.items[G.items.length - 1]; G.items.pop(); continue;
     }
@@ -2175,17 +2189,18 @@ function drawZone(z){
       // 判定の範囲(円と筋)を、うっすら見せたうえで、絵を、判定の長さ・太さ・半径にぴったり合わせて重ねる
       const age = z.max - z.life, Ab = Math.min(fade, inA);
       ctx.save(); ctx.globalAlpha = .09 * Ab * bf; ctx.fillStyle = '#dfe8ff';
-      if (beamOn) for (let k = 0; k < z.n; k++){ ctx.save(); ctx.translate(x, y); ctx.rotate(z.off + k * st); ctx.fillRect(R, -wp / 2, Lp - R, wp); ctx.restore(); }
+      if (beamOn) for (const go of z.offs) for (let k = 0; k < z.n; k++){ ctx.save(); ctx.translate(x, y); ctx.rotate(go + k * st); ctx.fillRect(R, -wp / 2, Lp - R, wp); ctx.restore(); }
       ctx.globalAlpha = .09 * Ab; ctx.beginPath(); ctx.arc(x, y, R, 0, TAU); ctx.fill(); ctx.restore();
       const fb = age < .3 ? Math.min(2, Math.floor(age / .1)) : 3 + (Math.floor((age - .3) * 10) % 3);   // 最初の0.3秒は、伸びるコマ。そのあとは、最大の長さのコマをくり返す
       const bw = (Lp - R) / FX.moonBeam.k, bh = wp / FX.moonBeam.ky;
-      if (beamOn) for (let k = 0; k < z.n; k++){ const ba = z.off + k * st; drawSpr('moonBeam', fb, x + Math.cos(ba) * R, y + Math.sin(ba) * R, ba, bw, bh, Ab * bf); }   // 光の筋は、輪の縁から外へ
+      if (beamOn) for (const go of z.offs) for (let k = 0; k < z.n; k++){ const ba = go + k * st; drawSpr('moonBeam', fb, x + Math.cos(ba) * R, y + Math.sin(ba) * R, ba, bw, bh, Ab * bf); }   // 光の筋は、輪の縁から外へ
       const rw = R / FX.moonRing.k; drawSpr('moonRing', Math.floor(G.t * 8) % 6, x, y, 0, rw, rw, Ab * .95);
       return;
     }
     ctx.save(); ctx.globalCompositeOperation = 'lighter';
-    for (let k = 0; beamOn && k < z.n; k++){
-      ctx.save(); ctx.translate(x, y); ctx.rotate(z.off + k * st); ctx.globalAlpha = bf;
+    for (let kk = 0; beamOn && kk < z.n * z.offs.length; kk++){
+      const go = z.offs[Math.floor(kk / z.n)], k = kk % z.n;
+      ctx.save(); ctx.translate(x, y); ctx.rotate(go + k * st); ctx.globalAlpha = bf;
       const gr = ctx.createLinearGradient(R, 0, Lp, 0);
       gr.addColorStop(0, 'rgba(255,246,200,' + (.3 * A) + ')'); gr.addColorStop(.25, 'rgba(255,246,210,' + (.42 * A) + ')'); gr.addColorStop(.7, 'rgba(210,225,255,' + (.34 * A) + ')'); gr.addColorStop(1, 'rgba(190,210,255,' + (.1 * A) + ')');
       ctx.fillStyle = gr; ctx.fillRect(R, -wp / 2, Lp - R, wp);
@@ -2554,10 +2569,26 @@ function endGame(){
   if (G.mode === 'end') META.stats.endBest = Math.max(META.stats.endBest, Math.floor(G.t / 60));
   checkTitles(); saveMeta();
   const s = Math.floor(G.t), mm = Math.floor(s / 60), ss = s % 60;
-  $('resTitle').textContent = G.win ? '退魔成功' : '力尽きた';
-  $('resTitle').style.color = G.win ? '#9ad8a0' : '#e8695e';
+  $('resTitle').textContent = G.win ? '退魔成功' : (G.retired ? 'リタイア' : '力尽きた');
+  $('resTitle').style.color = G.win ? '#9ad8a0' : (G.retired ? '#c9d3e6' : '#e8695e');
+  $('bossbar').classList.add('hide');
   $('resStats').innerHTML = '生き延びた時間 ' + mm + '分' + String(ss).padStart(2, '0') + '秒<br>到達レベル Lv' + G.p.lv + '<br>倒した妖怪 ' + G.kills + '体' + (G.newTitles.length ? '<br><b style="color:#9ad8a0">獲得した称号 ' + G.newTitles.map(n => '「' + n + '」').join('') + '</b>' : '') + (G.clearReward ? '<br>討伐報酬 小判' + G.clearReward + '枚' : '') + (G.survDone ? '<br>生存報酬 小判' + G.survReward + '枚(' + Math.floor(G.t / 60) + '分 × ' + END_REWARD_PER_MIN + '枚)' : '') + '<br>集めた小判(報酬を含む) ' + G.koban + '枚(所持 ' + META.koban + '枚)' + (G.unlockedMsg ? '<br><b style="color:#d8b45a">' + G.unlockedMsg + '</b>' : '');
   $('result').classList.remove('hide'); $('lvup').classList.add('hide');
+}
+/* リタイア: 敗北のときと、まったく同じ集計をして(小判の持ち帰り、百鬼夜行の生存報酬、記録、称号)、結果画面を出す */
+let retireTimer = 0;
+function retire(){
+  if (!G || G.over) return;
+  G.retired = true; G.paused = false; $('pause').classList.add('hide'); bgmSetDuck(1);
+  endGame();
+}
+function retireClick(){   // うっかり押さないよう、2回押したときに、リタイアする
+  const b = $('bQuit');
+  if (!retireTimer){
+    retireTimer = setTimeout(() => { retireTimer = 0; b.textContent = 'リタイア'; b.classList.remove('warn'); }, 3000);
+    b.textContent = '本当にリタイア?'; b.classList.add('warn'); return;
+  }
+  clearTimeout(retireTimer); retireTimer = 0; b.textContent = 'リタイア'; b.classList.remove('warn'); retire();
 }
 function toTitle(){
   sfxStopMag(); bgmWant('title', { fadeIn: 2, fadeOut: 1.2 }); bgmSetDuck(1);
@@ -3051,11 +3082,12 @@ window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; }
 function togglePause(){
   if (!G || G.over || G.modal) return;
   G.paused = !G.paused; $('pause').classList.toggle('hide', !G.paused); bgmSetDuck(G.paused ? .3 : 1);
+  if (retireTimer){ clearTimeout(retireTimer); retireTimer = 0; $('bQuit').textContent = 'リタイア'; $('bQuit').classList.remove('warn'); }
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden && metaDirty) saveMeta(); if (document.hidden && G && !G.over && !G.modal && !G.paused) togglePause(); });
 $('bPause').addEventListener('click', togglePause);
 $('bResume').addEventListener('click', togglePause);
-$('bQuit').addEventListener('click', toTitle);
+$('bQuit').addEventListener('click', retireClick);
 $('title').addEventListener('click', e => {
   if (e.target.closest && e.target.closest('button')) return;
   const r = cv.getBoundingClientRect(); titleTap(e.clientX - r.left, e.clientY - r.top);
