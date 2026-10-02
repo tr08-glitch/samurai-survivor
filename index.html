@@ -117,12 +117,25 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 .setrow input[type=range]{ flex:1; min-width:0; accent-color:#d8b45a; height:28px; }
 .setrow b{ flex:0 0 2em; text-align:right; font-size:18px; font-family:var(--font-display); }
 .shint{ margin:8px 4px 0; font-size:11.5px; color:var(--moon-dim); line-height:1.6; }
-.diffrow{ display:flex; gap:8px; align-items:center; margin:2px 0 4px; }
+#pauseInfo{ margin:0 0 16px; font-size:15px; line-height:1.8; text-align:center; color:var(--moon); }
+#pauseInfo .pd{ display:inline-block; margin-left:8px; padding:1px 10px; border:1px solid currentColor; border-radius:3px; font-size:13px; font-weight:800; }
+#pauseInfo .pd.normal{ color:#9ad8a0; } #pauseInfo .pd.hard{ color:#ffd45e; } #pauseInfo .pd.impossible{ color:#ff8a7a; }
+.diffrow{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px 8px; align-items:center; margin:2px 0 4px; }
 .diffrow span{ font-size:13px; color:var(--moon-dim); }
-.diffrow button{ padding:6px 14px; border:1px solid rgba(228,234,241,.35); border-radius:4px; background:rgba(13,18,33,.8); font-weight:700; font-size:13px; }
+.diffrow button.on.imp{ border-color:#ff6a5a; color:#ff8a7a; box-shadow:0 0 8px rgba(255,90,70,.35); }
+.diffrow button{ padding:6px 12px; border:1px solid rgba(228,234,241,.35); border-radius:4px; background:rgba(13,18,33,.8); font-weight:700; font-size:13px; }
 .diffrow button.on{ border-color:var(--kin); color:var(--kin); box-shadow:0 0 8px rgba(216,180,90,.3); }
 .diffrow button.lock{ opacity:.4; }
 .dhint{ margin:0 0 8px; font-size:11.5px; color:var(--moon-dim); text-align:center; line-height:1.5; max-width:420px; }
+.offer{ display:flex; flex-direction:column; gap:10px; align-items:stretch; padding:4px 2px; }
+.offer .oh{ font-family:var(--font-display); font-weight:800; font-size:18px; letter-spacing:.2em; color:var(--kin); }
+.offer .od{ margin:0; font-size:12.5px; line-height:1.7; color:var(--moon-dim); }
+.offer .btn.dis{ opacity:.4; }
+.offer .om{ min-height:22px; font-weight:800; font-size:14px; color:#ffd45e; text-align:center; }
+.offer .ob{ border:1px solid rgba(216,180,90,.55); border-radius:4px; background:rgba(13,18,33,.7); padding:10px 14px; }
+.offer .obt{ font-family:var(--font-display); font-weight:800; font-size:15px; letter-spacing:.3em; color:var(--kin); margin-bottom:6px; }
+.offer .obl{ display:flex; justify-content:space-between; padding:4px 0; font-size:14px; border-bottom:1px dashed rgba(228,234,241,.15); }
+.offer .obl:last-child{ border-bottom:none; }
 .ver{ margin-top:22px; font-size:11px; color:var(--moon-dim); text-align:center; line-height:1.7; max-width:340px; animation:fadeUp 1.6s ease-out 1.9s both; }
 @media (prefers-reduced-motion:reduce){ .logo,.logo img,.sub,.modebtn,.ver{ animation:none !important; } }
 
@@ -251,7 +264,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
   <section id="maps" class="screen hide">
     <h2>退魔の地</h2>
     <p class="hint">各地の主(ぬし)を討つと、新たな仲間が加わる</p>
-    <div class="diffrow"><span>難易度</span><button data-d="normal">ノーマル</button><button data-d="hard">ハード</button></div>
+    <div class="diffrow"><span>難易度</span><button data-d="normal">ノーマル</button><button data-d="hard">ハード</button><button data-d="impossible">インポッシブル</button></div>
     <p class="dhint"></p>
     <div id="maplist"></div>
     <div class="row3"><button class="btn" id="mBack">戻る</button><button class="btn sm" id="mAll">試遊用:全マップ解放</button></div>
@@ -260,7 +273,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
   <section id="chars" class="screen hide">
     <h2>出撃する者</h2>
     <p class="hint" id="charHint"></p>
-    <div class="diffrow"><span>難易度</span><button data-d="normal">ノーマル</button><button data-d="hard">ハード</button></div>
+    <div class="diffrow"><span>難易度</span><button data-d="normal">ノーマル</button><button data-d="hard">ハード</button><button data-d="impossible">インポッシブル</button></div>
     <p class="dhint"></p>
     <div id="charlist"></div>
     <div class="row3"><button class="btn" id="cBack">戻る</button><button class="btn sm" id="cAll">試遊用:全員解放</button></div>
@@ -289,7 +302,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
   <section id="shop" class="screen hide">
     <h2>強化</h2>
     <div class="wallet" id="wallet"></div>
-    <div class="tabs"><button id="tScroll" class="on">巻物</button><button id="tBase">基礎力</button><button id="tAlly">雇用</button></div>
+    <div class="tabs"><button id="tScroll" class="on">巻物</button><button id="tBase">基礎力</button><button id="tAlly">雇用</button><button id="tOffer">賽銭</button></div>
     <div id="shoplist"></div>
     <div class="row3"><button class="btn" id="sBack">戻る</button><button class="btn sm" id="sCheat">試遊用:小判+1000</button></div>
   </section>
@@ -301,7 +314,8 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
   </section>
 
   <section id="pause" class="screen hide">
-    <h2 style="font-family:var(--font-display);letter-spacing:.2em;margin:0 0 16px">一時停止</h2>
+    <h2 style="font-family:var(--font-display);letter-spacing:.2em;margin:0 0 8px">一時停止</h2>
+    <p id="pauseInfo"></p>
     <div class="row2"><button class="btn" id="bResume">再開</button><button class="btn" id="bSet2">設定</button><button class="btn" id="bQuit">リタイア</button></div>
   </section>
 
@@ -330,9 +344,9 @@ function defStats(){ return { kills:0, play:0, kobanAll:0, bestLv:1, endBest:0, 
 function loadMeta(){
   try {
     const m = JSON.parse(localStorage.getItem('ss_meta') || 'null');
-    if (m && typeof m.koban === 'number') return { koban: m.koban, up: m.up || {}, hired: m.hired || {}, moon: !!m.moon, mute: false, titles: m.titles || {}, stats: Object.assign(defStats(), m.stats || {}), diff: m.diff === 'hard' ? 'hard' : 'normal', settings: Object.assign(defSettings(), m.settings || {}, m.mute ? { bgm: 0, se: 0 } : {}) };   // 前の「音ON/OFF」でOFFにしていた人は、音量0にする
+    if (m && typeof m.koban === 'number') return { koban: m.koban, up: m.up || {}, hired: m.hired || {}, moon: !!m.moon, mute: false, titles: m.titles || {}, stats: Object.assign(defStats(), m.stats || {}), offer: Object.assign({ n:0, hp:0, atk:0, def:0 }, m.offer || {}), diff: (m.diff === 'hard' || m.diff === 'impossible') ? m.diff : 'normal', settings: Object.assign(defSettings(), m.settings || {}, m.mute ? { bgm: 0, se: 0 } : {}) };   // 前の「音ON/OFF」でOFFにしていた人は、音量0にする
   } catch (_) {}
-  return { koban: 0, up: {}, hired: {}, moon: false, mute: false, titles: {}, stats: defStats(), settings: defSettings(), diff: 'normal' };
+  return { koban: 0, up: {}, hired: {}, moon: false, mute: false, titles: {}, stats: defStats(), settings: defSettings(), diff: 'normal', offer: { n:0, hp:0, atk:0, def:0 } };
 }
 let META = loadMeta();
 let metaDirty = false, lastMetaSave = 0;
@@ -505,25 +519,25 @@ const WEAPONS = {
 const SPELLS = {
   katon:{ n:'火遁', ab:'火', desc:'近場の敵に火の玉を飛ばす(貫通なし)',
     base:{ dmg:25, cd:4, range:7, n:1 },
-    lv:[['ダメージ+20%',{d:.2}],['CT-10%',{c:.1}],['火の玉+1',{n:1}],['ダメージ+30%',{d:.3}]] },
+    lv:[['ダメージ+20%',{d:.2}],['CT-10%',{c:.1}],['火の玉+1(2個)',{n:1}],['ダメージ+30%',{d:.3}],['火の玉+1(3個)',{n:1}],['CT-10%、ダメージ+20%',{c:.1,d:.2}],['火の玉+1(4個)、ダメージ+30%',{n:1,d:.3}]] },
   suiton:{ n:'水遁', ab:'水', desc:'近場の敵へ直線上に水流。しばらく残り、貫通する',
     base:{ dmg:6, cd:5, range:6, dur:2, len:6, w:.9 },
-    lv:[['ダメージ+20%',{d:.2}],['CT-10%',{c:.1}],['持続時間+30%、ダメージの間隔-15%',{du:.3,tk:.15}],['ダメージ+30%、ダメージの間隔-15%',{d:.3,tk:.15}]] },
+    lv:[['ダメージ+20%',{d:.2}],['CT-10%',{c:.1}],['持続時間+30%、ダメージの間隔-15%',{du:.3,tk:.15}],['ダメージ+30%、ダメージの間隔-15%',{d:.3,tk:.15}],['水流の長さ+25%',{x:.25}],['CT-10%、ダメージ+25%',{c:.1,d:.25}],['持続時間+30%、ダメージ+30%',{du:.3,d:.3}]] },
   fuuton:{ n:'風遁', ab:'風', desc:'自身の周りに風の刃を回す(最初は1つ)',
     base:{ dmg:8, cd:8, dur:2.5, n:1, R:2.0, range:4 },
-    lv:[['ダメージ+20%、刃の当たる間隔-15%',{d:.2,tk:.15}],['風の刃+1',{n:1}],['CT-10%、刃の当たる間隔-15%',{c:.1,tk:.15}],['風の刃+1',{n:1}]] },
+    lv:[['ダメージ+20%、刃の当たる間隔-15%',{d:.2,tk:.15}],['風の刃+1',{n:1}],['CT-10%、刃の当たる間隔-15%',{c:.1,tk:.15}],['風の刃+1',{n:1}],['ダメージ+25%、持続時間+30%',{d:.25,du:.3}],['風の刃+1(4個)',{n:1}],['CT-10%、風の刃の回る範囲+25%',{c:.1,a:.25}]] },
   hyoui:{ n:'憑依', ab:'憑', desc:'しばらくの間、武器の攻撃力が上がる',
     base:{ buff:.3, cd:20, dur:8, range:6 },
-    lv:[['上昇率+10%',{buff:.1}],['CT-10%',{c:.1}],['持続時間+30%',{du:.3}],['上昇率+10%',{buff:.1}]] },
+    lv:[['上昇率+10%',{buff:.1}],['CT-10%',{c:.1}],['持続時間+30%',{du:.3}],['上昇率+10%',{buff:.1}],['上昇率+15%',{buff:.15}],['CT-10%、持続時間+30%',{c:.1,du:.3}],['上昇率+20%',{buff:.2}]] },
   shinen:{ n:'深淵侵食', ab:'淵', hidden:1, desc:'少し離れた位置に5つのブラックホールを作る。中に入った敵は継続ダメージを受け、周りの敵は中心へ引き寄せられる(持続4.4秒)',
     base:{ dmg:14, cd:11, dur:4.4, n:5, R:1.3, range:7 },
-    lv:[['ダメージ+25%',{d:.25}],['範囲+15%、ダメージの間隔-15%',{a:.15,tk:.15}],['CT-10%、ダメージの間隔-15%',{c:.1,tk:.15}],['ブラックホール+1(6個)',{n:1}]] },
+    lv:[['ダメージ+25%',{d:.25}],['範囲+15%、ダメージの間隔-15%',{a:.15,tk:.15}],['CT-10%、ダメージの間隔-15%',{c:.1,tk:.15}],['ブラックホール+1(6個)',{n:1}],['範囲+15%、ダメージ+20%',{a:.15,d:.2}],['ブラックホール+1(7個)',{n:1}],['CT-10%、持続時間+25%、ダメージ+25%',{c:.1,du:.25,d:.25}]] },
   gekkou:{ n:'月光', ab:'月', hidden:1, only:'tsukuyomi', desc:'自分の周りの月の輪(威力は低いが、長く続く)と、直線4方向の光の筋(威力は高いが、短い)を出す。光の上にいる敵は、継続ダメージを受ける(月詠専用)',
     base:{ dmg:12, cdmg:5, cd:8.5, dur:2.0, cdur:4.3, range:7, len:4.2, w:.7, R:1.5 },
-    lv:[['ダメージ+25%',{d:.25}],['光の筋の長さ+20%、ダメージの間隔-15%',{x:.2,tk:.15}],['光の筋が6本になる、CT-10%',{beams:6,c:.1}],['光の筋が8本になる、ダメージ+15%、ダメージの間隔-15%',{beams:8,d:.15,tk:.15}]] },
+    lv:[['ダメージ+25%',{d:.25}],['光の筋の長さ+20%、ダメージの間隔-15%',{x:.2,tk:.15}],['光の筋が6本になる、CT-10%',{beams:6,c:.1}],['光の筋が8本になる、ダメージ+15%、ダメージの間隔-15%',{beams:8,d:.15,tk:.15}],['光の筋の長さ+20%、持続時間+20%',{x:.2,du:.2}],['ダメージ+25%、範囲+15%',{d:.25,a:.15}],['光の筋が10本になる、CT-10%',{beams:10,c:.1}]] },
   kawarimi:{ n:'変わり身の術', ab:'身', desc:'敵の攻撃を1度だけ無効化。CT後に再発動',
     base:{ cd:30 },
-    lv:[['CT-15%',{c:.15}],['CT-15%',{c:.15}],['CT-15%',{c:.15}],['CT-15%',{c:.15}]] }
+    lv:[['CT-15%',{c:.15}],['CT-15%',{c:.15}],['CT-15%',{c:.15}],['CT-15%',{c:.15}],['CT-10%',{c:.1}],['CT-10%、身代わり後の無敵時間+0.3秒',{c:.1,inv:.3}],['CT-10%',{c:.1}]] }
 };
 const ARMOR = {
   kabuto:{ n:'兜', ab:'兜', t:l=>`最大HP+10%(合計+${10*l}%)` },
@@ -541,7 +555,7 @@ const SCROLLS = {
   jizoku:{ n:'持続の巻', ab:'続', t:l=>`全武器・全妖術の持続時間+8%${scrTot('jizoku', 8, l)}` },
   heiho:{ n:'兵法書', ab:'兵', t:l=>`残魂の獲得量+8%${scrTot('heiho', 8, l)}` },
   uranai:{ n:'占術の巻', ab:'占', t:l=>`レベルアップの選択肢+${(l + bu('uranai') >= 4 ? 2 : 1)}、おにぎり・小判のドロップ率+20%${scrTot('uranai', 20, l)}` },
-  senju:{ n:'千手の巻', ab:'千', rare:1, t:l=>`全武器・全妖術の攻撃回数+1(合計+${l}${bu('senju') ? '、強化の常時分を含めて+' + (l + bu('senju')) : ''})。追加分の威力は${Math.round(senjuFactor()*100)}%` }
+  senju:{ n:'千手の巻', ab:'千', rare:1, t:l=>`全武器・全妖術の攻撃回数+1(合計+${l}${bu('senju') ? '、強化の常時分を含めて+' + (l + bu('senju')) : ''})。追加分は、別の方向・別の敵を攻撃し、威力は${Math.round(senjuFactor()*100)}%` }
 };
 /* アイコン(ドット絵)。id → data URL。武器・妖術・防具・巻物のidで共通 */
 const ICON_IMG = {
@@ -643,7 +657,7 @@ const ET = {
   ibaraki:{ n:'茨木童子', hp:1200, spd:1.1, dmg:10, r:1.0, dash:1, boss:1, summon:1, add:'oni', kb:4, drop:[[3,3,1],[2,5,1]], item:'magatama' },
   shuten:{ n:'酒呑童子', hp:3700, spd:1.0, dmg:13, r:1.25, dash:1, boss:1, summon:1, add:'oni', kb:20, drop:[[4,1,1],[1,25,1],[2,8,1]] },
   nue:{ n:'鵺', hp:4000, spd:1.15, dmg:14, r:1.2, dash:1, boss:1, summon:1, add:'hinotama', kb:20, drop:[[4,1,1],[1,25,1],[2,8,1]] },
-  kin:{ n:'金の妖怪', hp:80, spd:2.0, dmg:0, r:.45, flee:1, drop:[[5,1,1]] }
+  kin:{ n:'金の妖怪', hp:80, spd:1.0, dmg:0, r:.45, flee:1, drop:[[5,1,1]] }
 };
 
 /* ================= 状態 ================= */
@@ -675,7 +689,10 @@ function newGame(mode, charId, mapIdx){
 
 /* ================= 補助計算 ================= */
 const need = lv => { const n = lv - 1; return Math.round((10 + 5*n + .5*n*n) * (1 + .03 * Math.max(0, n - 20))); };   // Lv21以降は、1レベルごとに+3%ずつ、必要な量が増える
-const maxHp = () => CFG.playerHP * (1 + .1 * (G.p.armor.kabuto || 0)) * G.p.ch.hp * (1 + .05 * bu('hp')) * (1 + tb('hp'));
+/* 賽銭(強化画面): 小判100枚で、基礎HP+1・基礎攻撃力+1・基礎防御力+0.2 のどれか1つを、ずっと得る */
+const OFFER_COST = 100;
+const offHp = () => META.offer.hp, offAtk = () => META.offer.atk, offDef = () => META.offer.def * .2;
+const maxHp = () => (CFG.playerHP + offHp()) * (1 + .1 * (G.p.armor.kabuto || 0)) * G.p.ch.hp * (1 + .05 * bu('hp')) * (1 + tb('hp'));
 const gDmg = () => (1 + .05 * sl('goriki')) * (1 + .02 * bu('power')) * (1 + tb('dmg'));
 const lowMul = () => (G.p.ch.low && G.p.hp <= maxHp() * .5) ? 1.2 : 1;
 const gWDmg = () => gDmg() * G.p.ch.wd * lowMul() * (G.p.art === 'chikurui' ? 1.2 : 1) * (G.p.art === 'tenka' ? 1.5 : 1);   // 天下無双: 武器の火力+50%
@@ -745,6 +762,15 @@ const aimTarget = (range) => {
   }
   return best;
 };
+/* 近い順に、敵を、n体まで選ぶ(攻撃の数が増えたときに、別々の敵を狙うため) */
+const nearestTargets = (range, n) => {
+  const p = G.p, arr = [];
+  for (const e of G.enemies){ if (e.dead || e.flee) continue; const d = (e.x - p.x) ** 2 + (e.y - p.y) ** 2; if (d < range * range) arr.push([d, e]); }
+  arr.sort((a, b) => a[0] - b[0]); return arr.slice(0, n).map(a => a[1]);
+};
+/* 攻撃がN回あるとき、k回目の向き: 左前→右前のように、順に、ずらす(Nが多くても、半円は超えない) */
+const variantAngle = (k, N, step) => N <= 1 ? 0 : (k - (N - 1) / 2) * Math.min(step, Math.PI / (N - 1));
+const rotV = (v, a) => { const c = Math.cos(a), sn = Math.sin(a); return { x: v.x * c - v.y * sn, y: v.x * sn + v.y * c }; };
 const unit = (dx, dy) => { const d = Math.hypot(dx, dy) || 1; return { x: dx / d, y: dy / d }; };
 const later = (t, fn) => G.later.push({ t, fn });
 
@@ -844,6 +870,7 @@ function kill(e){
     for (let i = 0; i < n; i++) spawnSoul(tier, e.x + rnd(-.5, .5), e.y + rnd(-.5, .5));
   }
   const itemMul = G.cfg.itemMul || 1;   // 第5地は、おにぎり・勾玉が、さらに出にくい
+  if (e.type === 'kin'){ const nk = Math.round(KIN_KOBAN * dropMul()); for (let i = 0; i < nk; i++) spawnItem('koban', e.x + rnd(-.9, .9), e.y + rnd(-.9, .9)); }   // 金の妖怪は、小判もたくさん落とす
   if (T.item){ if (Math.random() < BOSS_ITEM_RATE * itemMul) spawnItem(T.item, e.x, e.y); }   // ミニボス・中ボスの勾玉は、確実ではなくなった
   else if (!T.boss){
     const r = Math.random(), a = (T.mid ? ONIGIRI_MID : ONIGIRI_ZAKO) * dropMul() * itemMul;
@@ -868,7 +895,7 @@ function kill(e){
       const mi = G.mapIdx >= 0 ? G.mapIdx : 0;
       G.clearReward = (MAPS[mi] && MAPS[mi].clear) || 0; G.koban += G.clearReward;   // 討伐報酬(小判)
       if (!mapCleared(mi) && MAPS[mi] && MAPS[mi].reward) G.unlockedMsg = MAPS[mi].reward + 'が仲間に加わった';
-      const hardWas = hardOpen(); markCleared(mi); if (!hardWas && hardOpen()) G.hardMsg = true;
+      const hardWas = hardOpen(), hcWas = hardCleared(mi); markCleared(mi, G.diffKey); if (!hardWas && hardOpen()) G.hardMsg = true; if (!hcWas && hardCleared(mi)) G.impMsg = true;
       endGame();
     }
     else banner(T.n + '、討ち取った', 'good');
@@ -897,11 +924,21 @@ function addXp(v){
 const BOSS_HP = { mini: 2.8, mid: 3.5, final: 4 };
 /* 難易度。ハード=今までの強さ。ノーマル=それより簡単。ハードは、退魔モードの全マップの主を討つと、選べるようになる
    hp=雑魚の体力 / dmg=敵の攻撃力 / spawn=敵の出現の数(イベントの数も) / boss=ボス系の体力 */
-const DIFFS = { normal:{ n:'ノーマル', hp:.8, dmg:.75, spawn:.85, boss:.75 }, hard:{ n:'ハード', hp:1, dmg:1, spawn:1, boss:1 } };
+const DIFFS = { normal:{ n:'ノーマル', hp:.8, dmg:.75, spawn:.85, boss:.75 }, hard:{ n:'ハード', hp:1, dmg:1, spawn:1, boss:1 }, impossible:{ n:'インポッシブル', hp:1, dmg:1, spawn:2, boss:1 } };   // インポッシブル=ハードの、2倍の敵の出現数
 const hardOpen = () => allUnlocked || MAPS.every((m, i) => mapCleared(i));
-const curDiff = () => (META.diff === 'hard' && hardOpen()) ? 'hard' : 'normal';
+/* インポッシブルは、その地の主を「ハード以上」で討つと、その地で選べるようになる。百鬼夜行は、全ての地をハード以上で討つと選べる */
+const lsGet = k => { try { return localStorage.getItem(k) === '1'; } catch (_) { return false; } };
+const hardCleared = i => lsGet('ss_hclear_' + i), impCleared = i => lsGet('ss_iclear_' + i);
+const impAny = () => allUnlocked || MAPS.some((m, i) => hardCleared(i));
+const impOpenFor = (mode, i) => allUnlocked || (mode === 'end' ? MAPS.every((m, k) => hardCleared(k)) : hardCleared(i));
+function curDiff(mode, mapIdx){   // 選んだ難易度を、行き先に合わせて、使える難易度におさめる(使えなければ、1つ下げる)
+  const pref = META.diff;
+  if (pref === 'impossible' && impOpenFor(mode, mapIdx)) return 'impossible';
+  if ((pref === 'impossible' || pref === 'hard') && hardOpen()) return 'hard';
+  return 'normal';
+}
 const dens = () => (G.cfg.density || 1) * ((G.diff && G.diff.spawn) || 1);   // 敵の密度(マップごと × 難易度)
-const WRAP_MARGIN = 2.5;   // 画面の外へ、これだけ離れた敵は、反対側へ回り込む(出現位置の外側1.5マスより外)
+const WRAP_MARGIN = 1.0, BOSS_WRAP_MARGIN = 2.5, SPAWN_JITTER = .7;   // 画面の外の輪から、これだけ外へ出た敵は、反対側へ回り込む(出現位置は、輪の外側0.7マスまで)
 const BOSS_FIGHT_SPAWN = .35;   // 主との戦いの間の、ふつうの敵の出現の倍率
 const FINAL_RAID = 2.2;   // 第5地(最終ステージ)の主は、さらに体力が高い(×2.5)
 const CINE_REVEAL = 9.4, CINE_END = 10.2;   // 暗転の演出: 主が現れる時刻、演出が終わる時刻(秒)
@@ -936,7 +973,7 @@ function updateSpawns(dt){
   while (G.spAcc >= 1){
     G.spAcc--;
     if (G.enemies.length >= capN()) break;
-    const q = ringPos(rnd(0, 1.5));
+    const q = ringPos(rnd(0, SPAWN_JITTER));
     spawnEnemy(pickType(m), q.x, q.y);
   }
 }
@@ -965,7 +1002,13 @@ const EV = {
   } },
   tsukiyo:{ n:'月夜', f(){ G.moonT = G.t + 25; } },
   fog:{ n:'濃霧', f(){ G.fogT = G.t + 25; } },
-  kin:{ n:'金の妖怪', f(){ const q = ringPos(-2.2); spawnEnemy('kin', q.x, q.y, { life: 30 }); banner('金の妖怪、出現! 逃げる前に倒せ', 'good'); } },
+  kin:{ n:'金の妖怪', f(){
+    // 画面の中(ふちから少し内側)に、自分から少し離れた所へ出る
+    const hx = hw() * .85, hy = hh() * .85, a = Math.random() * TAU, c = Math.cos(a), sn = Math.sin(a);
+    const tmax = Math.min(Math.abs(c) > 1e-6 ? hx / Math.abs(c) : 1e9, Math.abs(sn) > 1e-6 ? hy / Math.abs(sn) : 1e9);
+    const dist = Math.min(tmax * .95, Math.max(2.8, tmax * rnd(.55, .95)));
+    spawnEnemy('kin', G.p.x + c * dist, G.p.y + sn * dist, { life: 30 }); banner('金の妖怪、出現! 逃げる前に倒せ', 'good');
+  } },
   wave:{ n:'百鬼の大波', boss:1, f(){
     // 8方向から、0.5秒ごとに14回、どんどん湧き出して押し寄せる(時間が進むほど、1回の数が増える)
     const m = vsec() / 60, per = 2 + Math.floor(m / 10), dn = dens();
@@ -974,7 +1017,7 @@ const EV = {
       const a0 = rnd(0, TAU), n = Math.max(1, Math.round(per * dn));
       for (let d = 0; d < 8; d++) for (let k = 0; k < n; k++){
         if (G.enemies.length >= hardCapN()) return;
-        const q = ringPos(rnd(0, 1.6), a0 + d * TAU / 8 + rnd(-.22, .22)); spawnEnemy(pickType(m), q.x, q.y);
+        const q = ringPos(rnd(0, SPAWN_JITTER), a0 + d * TAU / 8 + rnd(-.22, .22)); spawnEnemy(pickType(m), q.x, q.y);
       }
     });
   } },
@@ -1107,7 +1150,7 @@ function updateTimeline(){
 }
 
 /* ================= 発射・攻撃 ================= */
-function pDmg(s, dm){ return (s.dmg || 0) * s.dmgMul * dm * gWDmg() * (G.p.buffT > 0 ? G.p.buffMul : 1); }
+function pDmg(s, dm){ return ((s.dmg || 0) + offAtk()) * s.dmgMul * dm * gWDmg() * (G.p.buffT > 0 ? G.p.buffMul : 1); }
 function sweep(x, y, dir, R, arc, inner, dmg, col, dur, fxId){
   const a = Math.atan2(dir.y, dir.x), half = arc * Math.PI / 360;
   for (const e of G.enemies){
@@ -1147,44 +1190,47 @@ function fireWeapon(w){
   const D = WEAPONS[w.id], s = statsOf(D, w.lv), times = 1 + weaponExtra();
   for (let i = 0; i < times; i++){
     const dm = i === 0 ? 1 : senjuFactor();
-    if (i === 0) doFire(D, s, dm); else later(i * .15, () => doFire(D, s, dm));
+    if (i === 0) doFire(D, s, dm, i, times); else later(i * .15, () => doFire(D, s, dm, i, times));
   }
   return s.cd * s.cdMul * gCd() * G.p.ch.wcd * artWcd();
 }
-function doFire(D, s, dm){
+function doFire(D, s, dm, k, N){
+  k = k || 0; N = N || 1;   // N回の攻撃の、k回目。2回以上のときは、1回ごとに、別の場所を攻撃する
   const p = G.p, f = p.face, dmg = pDmg(s, dm), ar = gArea(), du = (s.dur || .2) * gDur();
   switch (D.type){
     case 'fan': {
       const R = s.range * s.areaMul * s.rngMul * ar;
-      const dirOf = () => { if (!D.aim) return G.p.face; const t = aimTarget(10); return t ? unit(t.x - G.p.x, t.y - G.p.y) : G.p.face; };
+      const dirOf = () => { let b = G.p.face; if (D.aim){ const t = aimTarget(10); if (t) b = unit(t.x - G.p.x, t.y - G.p.y); } return N > 1 ? rotV(b, variantAngle(k, N, 1.05)) : b; };   // 2回なら、左前→右前
       sweep(p.x, p.y, dirOf(), R, s.arc, 0, dmg, D.col, du, D.fx);
       if (s.echo) later(.15, () => sweep(G.p.x, G.p.y, dirOf(), R, s.arc, 0, dmg, D.col, du, D.fx));
       if (s.wave) shoot({ vx: f.x * 9, vy: f.y * 9, dmg: dmg * .5, r: .8, hits: 999, life: .9, col: D.col, kind:'wave' });
       break; }
     case 'ring':
-      sweep(p.x, p.y, f, s.range * s.rngMul * s.areaMul * ar, s.arc, s.inner * ar, dmg, D.col, du, D.fx);
+      sweep(p.x, p.y, rotV(f, variantAngle(k, N, 1.05)), s.range * s.rngMul * s.areaMul * ar, s.arc, s.inner * ar, dmg, D.col, du, D.fx);
       break;
     case 'dual': {
       const fr = dmg * s.fdMul, rr = s.rearEq ? fr : s.rdmg * s.dmgMul * dm * gWDmg() * (p.buffT > 0 ? p.buffMul : 1);
-      sweep(p.x, p.y, f, s.range * s.areaMul * ar, s.arc, 0, fr, D.col, du, D.fx);
-      sweep(p.x, p.y, { x: -f.x, y: -f.y }, s.rrange * s.raMul * s.areaMul * ar, s.rarc, 0, rr, D.col, du, D.fx);
+      const fv = rotV(f, variantAngle(k, N, 1.05));
+      sweep(p.x, p.y, fv, s.range * s.areaMul * ar, s.arc, 0, fr, D.col, du, D.fx);
+      sweep(p.x, p.y, { x: -fv.x, y: -fv.y }, s.rrange * s.raMul * s.areaMul * ar, s.rarc, 0, rr, D.col, du, D.fx);
       break; }
     case 'thrust': {
       const L = s.len * s.rngMul * ar, off = [0];
       if (s.side) off.push(-1.3, 1.3);
-      const perp = { x: -f.y, y: f.x };
-      for (const o of off) lineHit(p.x + perp.x * o, p.y + perp.y * o, f, L, s.w, dmg, D.col, du, D.fx);
+      const fv = rotV(f, variantAngle(k, N, .6)), perp = { x: -fv.y, y: fv.x };
+      for (const o of off) lineHit(p.x + perp.x * o, p.y + perp.y * o, fv, L, s.w, dmg, D.col, du, D.fx);
       break; }
     case 'bullet': {
       const ex = { r: s.ba * s.baMul * ar, dmg: s.bd * s.bdMul * dm * gWDmg(), burn: !!s.burn };
-      shoot({ vx: f.x * 22, vy: f.y * 22, dmg, r: .2, hits: 1, life: s.range / 22, col: D.col, kind:'bullet', expl: ex });
+      const fv = rotV(f, variantAngle(k, N, .35));
+      shoot({ vx: fv.x * 22, vy: fv.y * 22, dmg, r: .2, hits: 1, life: s.range / 22, col: D.col, kind:'bullet', expl: ex });
       break; }
     case 'arrow': {
-      const angs = s.fan ? [-.14, .14] : [0], base = Math.atan2(f.y, f.x);
+      const angs = s.fan ? [-.14, .14] : [0], base = Math.atan2(f.y, f.x) + variantAngle(k, N, .35);
       for (const o of angs) shoot({ vx: Math.cos(base + o) * 13, vy: Math.sin(base + o) * 13, dmg, r: .25, hits: s.hits, life: s.range / 13, col: D.col, kind:'arrow' });
       break; }
     case 'kunai': {
-      const n = s.count || 3, base = Math.atan2(f.y, f.x), step = .26;
+      const n = s.count || 3, base = Math.atan2(f.y, f.x) + variantAngle(k, N, .5), step = .26;
       for (let i = 0; i < n; i++){
         const ang = base + (i - (n - 1) / 2) * step;       // 左前から右前へ、順番に
         const mk = () => shoot({ vx: Math.cos(ang) * 12, vy: Math.sin(ang) * 12, dmg, r: .2, hits: s.hits, life: s.range * s.rngMul / 12, col: D.col, kind:'kunai' });
@@ -1192,27 +1238,30 @@ function doFire(D, s, dm){
       }
       break; }
     case 'dart': {
-      const t = aimTarget(10), d = t ? unit(t.x - p.x, t.y - p.y) : f, base = Math.atan2(d.y, d.x), n = s.count || 1;
+      const n = s.count || 1, tl = nearestTargets(10, n * N), t = tl[0] || null, d0 = t ? unit(t.x - p.x, t.y - p.y) : f, base0 = Math.atan2(d0.y, d0.x);
       for (let i = 0; i < n; i++){
-        const a = base + (i - (n - 1) / 2) * .16;
+        const j = k * n + i, tg = tl[j];   // 1本ごとに、別々の敵を狙う(敵が足りなければ、少しずらして撃つ)
+        const a = tg ? Math.atan2(tg.y - p.y, tg.x - p.x) : base0 + (j - (n * N - 1) / 2) * .16;
         shoot({ vx: Math.cos(a) * 14, vy: Math.sin(a) * 14, dmg, r: .22, hits: 2, life: s.range * s.rngMul / 14, col: D.col, kind:'dart', poison: !!s.poison });
       }
       break; }
     case 'shuriken': {
-      const t = aimTarget(10), d = t ? unit(t.x - p.x, t.y - p.y) : f, base = Math.atan2(d.y, d.x), n = s.count || 1;
+      const n = s.count || 1, tl = nearestTargets(10, n * N), t = tl[0] || null, d0 = t ? unit(t.x - p.x, t.y - p.y) : f, base0 = Math.atan2(d0.y, d0.x);
       for (let i = 0; i < n; i++){
-        const a = base + (i - (n - 1) / 2) * .5;
+        const j = k * n + i, tg = tl[j];
+        const a = tg ? Math.atan2(tg.y - p.y, tg.x - p.x) : base0 + (j - (n * N - 1) / 2) * .5;
         shoot({ vx: Math.cos(a) * 7, vy: Math.sin(a) * 7, dmg, r: .3, hits: 99999, life: s.dur * s.durMul * gDur(), col: D.col, kind:'shuriken', bounce: s.bounce });
       }
       break; }
     case 'zone': {
       const mine = G.zones.filter(z => z.kind === 'bishi');
       while (mine.length >= (s.max || 2)){ const z = mine.shift(); G.zones.splice(G.zones.indexOf(z), 1); }
-      G.zones.push({ kind:'bishi', x: p.x, y: p.y, r: s.r * s.areaMul * ar, life: s.dur * s.durMul * gDur(), tickT: 0, ti: .5 * s.tkMul, dmg, slow: s.slow ? .7 : 1, col: D.col });
+      const zo = (k - (N - 1) / 2) * 1.7, zp = { x: -f.y, y: f.x };   // 2回以上なら、左・右のように、別の場所にまく
+      G.zones.push({ kind:'bishi', x: p.x + zp.x * zo, y: p.y + zp.y * zo, r: s.r * s.areaMul * ar, life: s.dur * s.durMul * gDur(), tickT: 0, ti: .5 * s.tkMul, dmg, slow: s.slow ? .7 : 1, col: D.col });
       break; }
     case 'spin': {
       const R = s.r * s.areaMul * ar;
-      const dur = (s.dur || .5) * gDur(), a0 = Math.atan2(f.y, f.x);
+      const dur = (s.dur || .5) * gDur(), a0 = Math.atan2(f.y, f.x) + (N > 1 ? k * TAU / N : 0);   // 2回以上なら、回り始める向きを、等間隔にずらす
       G.fx.push({ k:'fan', x: p.x, y: p.y, a: 0, arc: TAU, R, inner: 0, life: dur, max: dur, col: D.col, soft:true });
       G.spins.push({ a0, cur: a0, dir: 1, t: 0, dur, R, dmg, hit: new Set(), col: D.col });
       if (s.double) later(dur, () => G.spins.push({ a0, cur: a0, dir: -1, t: 0, dur, R, dmg, hit: new Set(), col: D.col }));
@@ -1233,16 +1282,18 @@ function explode(x, y, ex){
 function fireSpell(sp){
   const D = SPELLS[sp.id], s = statsOf(D, sp.lv), p = G.p, ar = gArea();
   const times = 1 + extraTimes(), cd = (s.cd || 1) * s.cdMul * gSCd();
-  const dmgBase = (s.dmg || 0) * s.dmgMul * gSDmg();
+  const dmgBase = ((s.dmg || 0) + offAtk()) * s.dmgMul * gSDmg();
   switch (sp.id){
     case 'katon': {
       const t = aimTarget(s.range); if (!t) return 0;
+      const n = s.n || 1, tl = nearestTargets(s.range, n * times);   // 火の玉は、1つずつ、別々の敵を狙う
       for (let k = 0; k < times; k++){
         const dm = k === 0 ? 1 : senjuFactor();
         later(k * .15, () => {
-          const n = s.n || 1, tg = aimTarget(s.range) || t;
           for (let i = 0; i < n; i++){
-            const d = unit(tg.x - G.p.x, tg.y - G.p.y), a = Math.atan2(d.y, d.x) + (i - (n - 1) / 2) * .3;
+            const j = k * n + i; let tg = tl[j], off = 0;
+            if (!tg || tg.dead){ tg = tl.find(e => !e.dead) || aimTarget(s.range) || t; off = (j - (n * times - 1) / 2) * .22; }   // 敵が足りなければ、少しずらして撃つ
+            const d = unit(tg.x - G.p.x, tg.y - G.p.y), a = Math.atan2(d.y, d.x) + off;
             shoot({ vx: Math.cos(a) * 10, vy: Math.sin(a) * 10, dmg: dmgBase * dm, r: .34, hits: 1, life: 1.2, col:'#ff8a3d', kind:'fire' });
           }
         });
@@ -1250,10 +1301,13 @@ function fireSpell(sp){
       return cd; }
     case 'suiton': {
       const t = aimTarget(s.range); if (!t) return 0;
+      const tl = nearestTargets(s.range, times);   // 水流は、1本ずつ、別々の敵を狙う
       for (let k = 0; k < times; k++){
-        const dm = k === 0 ? 1 : senjuFactor(), ang = k * .5 * (k % 2 ? 1 : -1);
+        const dm = k === 0 ? 1 : senjuFactor();
         later(k * .15, () => {
-          const d = unit(t.x - G.p.x, t.y - G.p.y), a = Math.atan2(d.y, d.x) + ang;
+          let tg = tl[k], ang = 0;
+          if (!tg || tg.dead){ tg = tl.find(e => !e.dead) || t; ang = variantAngle(k, times, .6); }   // 敵が足りなければ、左前→右前のように、向きをずらす
+          const d = unit(tg.x - G.p.x, tg.y - G.p.y), a = Math.atan2(d.y, d.x) + ang;
           G.zones.push({ kind:'line', x: G.p.x, y: G.p.y, x2: G.p.x + Math.cos(a) * s.len * s.rngMul * ar, y2: G.p.y + Math.sin(a) * s.len * s.rngMul * ar,
             w: s.w * ar, life: s.dur * s.durMul * gDur(), tickT: 0, ti: .5 * s.tkMul, dmg: dmgBase * dm, slow: 1 });
         });
@@ -1261,7 +1315,7 @@ function fireSpell(sp){
       return cd; }
     case 'fuuton': {
       if (!aimTarget(s.range)) return 0;
-      p.windT = s.dur * s.durMul * gDur(); p.windN = (s.n || 1) + times - 1; p.windDmg = dmgBase; p.windR = s.R * ar; p.windTi = .5 * s.tkMul;
+      p.windT = s.dur * s.durMul * gDur(); p.windN = (s.n || 1) + times - 1; p.windDmg = dmgBase; p.windR = s.R * s.areaMul * ar; p.windTi = .5 * s.tkMul;
       return cd; }
     case 'shinen': {
       if (!aimTarget(s.range)) return 0;
@@ -1329,10 +1383,11 @@ function playerHit(e){
   if (p.hasSub && p.sub.ready){
     const ks = statsOf(SPELLS.kawarimi, p.spells.find(s => s.id === 'kawarimi').lv);
     p.sub.ready = false; p.sub.t = ks.cd * ks.cdMul * gSCd();
-    p.invT = .5; G.fx.push({ k:'ring', x: p.x, y: p.y, R: 1.4, life: .5, max: .5, col:'#7fb4ff' }); fxAt('smoke', p.x, p.y, 0, 1.4 / FX.smoke.k, .6);
+    p.invT = .5 + (ks.inv || 0); G.fx.push({ k:'ring', x: p.x, y: p.y, R: 1.4, life: .5, max: .5, col:'#7fb4ff' }); fxAt('smoke', p.x, p.y, 0, 1.4 / FX.smoke.k, .6);
     return;
   }
-  p.hp -= e.dmg * dmgScale() * (1 - .05 * (p.armor.yoroi || 0)) * (1 - .02 * bu('guard')) * p.ch.taken;
+  const raw = e.dmg * dmgScale() * (1 - .05 * (p.armor.yoroi || 0)) * (1 - .02 * bu('guard')) * p.ch.taken;
+  p.hp -= Math.max(raw * .25, raw - offDef());   // 基礎防御力: 1回に受けるダメージから、その分を引く(最低でも、4分の1は受ける)
   p.invT = CFG.baseInvuln + .1 * (p.armor.kote || 0) + .06 * bu('invuln') + p.ch.inv;
   p.hitFlash = .15;
 }
@@ -1380,10 +1435,10 @@ function updateEnemies(dt){
         if (bd > b.r - e.r){ e.x = b.x + bx / bd * (b.r - e.r); e.y = b.y + by / bd * (b.r - e.r); }
       }
       if (!e.boss && d > rr + WRAP_MARGIN){   // 画面の外へ見切れた敵は、見切れた側の反対側から、回り込んで出てくる
-        const a = Math.atan2(e.y - p.y, e.x - p.x) + Math.PI + rnd(-.3, .3), R = rr + rnd(0, 1.2);
+        const a = Math.atan2(e.y - p.y, e.x - p.x) + Math.PI + rnd(-.3, .3), R = rr + rnd(0, SPAWN_JITTER);
         e.x = p.x + Math.cos(a) * R; e.y = p.y + Math.sin(a) * R; if (T.dash){ e.st = 0; e.stT = rnd(1.5, 3); }
       }
-      else if (e.boss && !G.barrier && d > rr + 5){   // 離れすぎたボスは、自分をはさんで反対側の、画面の外から、回り込んで出てくる
+      else if (e.boss && !G.barrier && d > rr + BOSS_WRAP_MARGIN){   // 離れすぎたボスは、自分をはさんで反対側の、画面の外から、回り込んで出てくる
         const R = rr + .6; e.x = p.x - (e.x - p.x) / d * R; e.y = p.y - (e.y - p.y) / d * R; e.st = 0; e.stT = rnd(1.5, 3);
         G.fx.push({ k:'ring', x: e.x, y: e.y, R: 1.6, life: .45, max: .45, col:'#ff6a5a' });
       }
@@ -1605,7 +1660,7 @@ function buildChoices(){
   const p = G.p, groups = { w:[], s:[], a:[], r:[] };
   for (const w of p.weapons) if (w.lv < 8) groups.w.push({ k:'w', id: w.id });
   if (p.weapons.length < weaponSlots()) for (const id in WEAPONS) if (!p.weapons.some(w => w.id === id) && (!WEAPONS[id].only || WEAPONS[id].only === G.charId) && !isLocked('w', id)) groups.w.push({ k:'w', id });
-  for (const s of p.spells) if (s.lv < 5) groups.s.push({ k:'s', id: s.id });
+  for (const s of p.spells) if (s.lv < SPELLS[s.id].lv.length + 1) groups.s.push({ k:'s', id: s.id });   // 妖術も、武器と同じ、Lv8まで
   if (p.spells.length < 3) for (const id in SPELLS) if (!p.spells.some(s => s.id === id) && !SPELLS[id].hidden && !isLocked('s', id)) groups.s.push({ k:'s', id });
   if (p.art === 'chikurui') groups.s.length = 0;   // 血狂い: 妖術は使えない
   if (p.art === 'akuma') groups.w.length = 0;      // 悪魔付き: 武器は使えない(レベルアップにも出ない)
@@ -1649,13 +1704,13 @@ function applyChoice(c){
   trackMax(c);
   renderSlots();
 }
-/* 武器Lv8・妖術Lv5・防具Lv5・巻物Lv5(千手はLv3)に達したら記録する */
+/* 称号のために、武器Lv5・妖術Lv5・防具Lv5(最大)・巻物Lv3(千手はLv2)に達したら記録する */
 function trackMax(c){
   const p = G.p; let lv = 0, key = null;
-  if (c.k === 'w'){ const w = p.weapons.find(x => x.id === c.id); lv = w ? w.lv : 0; if (lv >= 8) key = 'maxW'; }
+  if (c.k === 'w'){ const w = p.weapons.find(x => x.id === c.id); lv = w ? w.lv : 0; if (lv >= 5) key = 'maxW'; }
   else if (c.k === 's'){ const sp = p.spells.find(x => x.id === c.id); lv = sp ? sp.lv : 0; if (lv >= 5) key = 'maxS'; }
   else if (c.k === 'a'){ lv = p.armor[c.id] || 0; if (lv >= 5) key = 'maxA'; }
-  else if (c.k === 'r'){ lv = p.scrolls[c.id] || 0; if (lv >= (c.id === 'senju' ? 3 : 5)) key = 'maxR'; }
+  else if (c.k === 'r'){ lv = p.scrolls[c.id] || 0; if (lv >= (c.id === 'senju' ? 2 : 3)) key = 'maxR'; }
   if (key) markMax(key, c.id);
 }
 function applyArt(id){
@@ -2581,7 +2636,7 @@ function render(){
 /* ================= 進行 ================= */
 function startGame(mode, charId, mapIdx){
   newGame(mode, charId, mapIdx); META.stats.runs++; metaDirty = true;
-  G.diffKey = curDiff(); G.diff = DIFFS[G.diffKey];
+  G.diffKey = curDiff(mode, mapIdx); G.diff = DIFFS[G.diffKey];
   bgmWant(mode === 'end' ? 'endless' : (mapIdx >= 3 ? 'late' : 'early'), { fadeIn: 2, fadeOut: 1 });   // 百鬼夜行=朧神 / 序盤=鳴ラヌ弦 / 終盤=陰の封印
   curMap = mode === 'end' ? 'end' : (mapIdx >= 0 ? mapIdx : 0); loadGround(curMap); buildTile();
   ['title', 'maps', 'chars', 'shop', 'titles', 'settings', 'result', 'pause', 'lvup'].forEach(id => $(id).classList.add('hide'));
@@ -2592,6 +2647,7 @@ function startGame(mode, charId, mapIdx){
 /* 百鬼夜行: 生き延びた分数に比例して、小判をもらえる(1分あたり10枚) */
 const END_REWARD_PER_MIN = 10;
 const ONIGIRI_ZAKO = .0010, ONIGIRI_MID = .010, MAGATAMA_ZAKO = .0009, MAGATAMA_MID = .009, BOSS_ITEM_RATE = .55;   // 敵1体あたりの、おにぎり・勾玉のドロップ率
+const KIN_KOBAN = 8;   // 金の妖怪が落とす小判の数(占術の巻で増える)
 const KOBAN_ZAKO = .006, KOBAN_MID = .08;   // 敵1体あたりの、小判のドロップ率(雑魚0.3%、中型4%)
 function endlessReward(){
   if (!G || G.mode !== 'end' || G.survDone) return; G.survDone = true;
@@ -2608,7 +2664,7 @@ function endGame(){
   $('resTitle').textContent = G.win ? '退魔成功' : (G.retired ? 'リタイア' : '力尽きた');
   $('resTitle').style.color = G.win ? '#9ad8a0' : (G.retired ? '#c9d3e6' : '#e8695e');
   $('bossbar').classList.add('hide');
-  $('resStats').innerHTML = '難易度 ' + (G.diff ? G.diff.n : '') + (G.hardMsg ? '<br><b style="color:#ffd45e">ハードが解禁された!</b>' : '') + '<br>生き延びた時間 ' + mm + '分' + String(ss).padStart(2, '0') + '秒<br>到達レベル Lv' + G.p.lv + '<br>倒した妖怪 ' + G.kills + '体' + (G.newTitles.length ? '<br><b style="color:#9ad8a0">獲得した称号 ' + G.newTitles.map(n => '「' + n + '」').join('') + '</b>' : '') + (G.clearReward ? '<br>討伐報酬 小判' + G.clearReward + '枚' : '') + (G.survDone ? '<br>生存報酬 小判' + G.survReward + '枚(' + Math.floor(G.t / 60) + '分 × ' + END_REWARD_PER_MIN + '枚)' : '') + '<br>集めた小判(報酬を含む) ' + G.koban + '枚(所持 ' + META.koban + '枚)' + (G.unlockedMsg ? '<br><b style="color:#d8b45a">' + G.unlockedMsg + '</b>' : '');
+  $('resStats').innerHTML = '難易度 ' + (G.diff ? G.diff.n : '') + (G.hardMsg ? '<br><b style="color:#ffd45e">ハードが解禁された!</b>' : '') + (G.impMsg ? '<br><b style="color:#ff8a7a">この地のインポッシブルが解禁された!</b>' : '') + '<br>生き延びた時間 ' + mm + '分' + String(ss).padStart(2, '0') + '秒<br>到達レベル Lv' + G.p.lv + '<br>倒した妖怪 ' + G.kills + '体' + (G.newTitles.length ? '<br><b style="color:#9ad8a0">獲得した称号 ' + G.newTitles.map(n => '「' + n + '」').join('') + '</b>' : '') + (G.clearReward ? '<br>討伐報酬 小判' + G.clearReward + '枚' : '') + (G.survDone ? '<br>生存報酬 小判' + G.survReward + '枚(' + Math.floor(G.t / 60) + '分 × ' + END_REWARD_PER_MIN + '枚)' : '') + '<br>集めた小判(報酬を含む) ' + G.koban + '枚(所持 ' + META.koban + '枚)' + (G.unlockedMsg ? '<br><b style="color:#d8b45a">' + G.unlockedMsg + '</b>' : '');
   $('result').classList.remove('hide'); $('lvup').classList.add('hide');
 }
 /* リタイア: 敗北のときと、まったく同じ集計をして(小判の持ち帰り、百鬼夜行の生存報酬、記録、称号)、結果画面を出す */
@@ -2820,6 +2876,7 @@ function toast(text){
 }
 function titleTap(cx, cy, nowMs){
   const m = TS.moon; if (!m) return 'none';
+  if (!hardOpen()) return 'none';   // 月をタップできるのは、ハードが解禁されてから(それまでは、鈴も鳴らず、数えない)
   if (Math.hypot(cx - m.x, cy - m.y) > m.r * 1.08) return 'miss';
   sfxBell();                                          // 月に当たったら、鈴が鳴る
   const now = nowMs === undefined ? Date.now() : nowMs;
@@ -2874,33 +2931,47 @@ const CHAR_MARK = { tsukuyomi:'月', robo:'機', samurai:'侍', ronin:'浪', mus
 let allUnlocked = false, pending = { mode:'run', map:0 };
 const charUnlocked = c => allUnlocked || (c.secretMoon ? !!META.moon : c.secret ? c.secret.every(id => META.hired[id]) : c.hire ? !!META.hired[c.id] : (c.unlock === undefined || mapCleared(c.unlock)));
 const mapCleared = i => { try { return localStorage.getItem('ss_clear_' + i) === '1'; } catch (_) { return false; } };
-const markCleared = i => { try { localStorage.setItem('ss_clear_' + i, '1'); } catch (_) {} };
+const markCleared = (i, dk) => { try { localStorage.setItem('ss_clear_' + i, '1'); if (dk === 'hard' || dk === 'impossible') localStorage.setItem('ss_hclear_' + i, '1'); if (dk === 'impossible') localStorage.setItem('ss_iclear_' + i, '1'); } catch (_) {} };
+const bestClear = i => impCleared(i) ? 'インポッシブル' : (hardCleared(i) ? 'ハード' : (mapCleared(i) ? 'ノーマル' : ''));
 let allMaps = false;
 const mapOpen = i => i === 0 || allMaps || allUnlocked || mapCleared(i - 1);
-function renderDiff(){
-  const cur = curDiff(), open = hardOpen();
+let diffCtx = null;   // 出撃する者の画面のときだけ、行き先({ mode, map })が決まっている
+function renderDiff(ctx){
+  if (ctx !== undefined) diffCtx = ctx;
+  const c = diffCtx, mode = c ? c.mode : 'run', mi = c ? c.map : 0, hOpen = hardOpen();
+  const iOpen = c ? impOpenFor(mode, mi) : impAny();   // 行き先がまだ決まっていない画面では、どれか1つの地で、解禁されていれば、選べる
+  const cur = c ? curDiff(mode, mi) : (META.diff === 'impossible' && iOpen ? 'impossible' : ((META.diff === 'impossible' || META.diff === 'hard') && hOpen ? 'hard' : 'normal'));
   document.querySelectorAll('.diffrow').forEach(row => row.querySelectorAll('button').forEach(b => {
-    const d = b.dataset.d; b.classList.toggle('on', d === cur); b.classList.toggle('lock', d === 'hard' && !open); b.textContent = DIFFS[d].n + (d === 'hard' && !open ? '(未解禁)' : '');
+    const d = b.dataset.d, lock = (d === 'hard' && !hOpen) || (d === 'impossible' && !iOpen);
+    b.classList.toggle('on', d === cur); b.classList.toggle('imp', d === 'impossible'); b.classList.toggle('lock', lock); b.textContent = DIFFS[d].n + (lock ? '(未解禁)' : '');
   }));
-  const tx = open ? (cur === 'hard' ? 'ハード: 今までの強さ。敵の体力・攻撃力・数、ボスの体力が高い' : 'ノーマル: 敵の体力-20%・攻撃力-25%・出現数-15%、ボスの体力-25%') : 'ハードは、退魔モードの全ての地の主を討つと、選べるようになる';
+  let tx;
+  if (cur === 'impossible') tx = 'インポッシブル: ハードの2倍の敵の出現数(ほかは、ハードと同じ)';
+  else if (cur === 'hard') tx = 'ハード: 今までの強さ。敵の体力・攻撃力・数、ボスの体力が高い' + (!iOpen ? '。' + (c ? (mode === 'end' ? '百鬼夜行のインポッシブルは、全ての地の主を、ハードで討つと選べる' : 'この地のインポッシブルは、この地の主を、ハードで討つと選べる') : 'インポッシブルは、地ごとに、その地の主を、ハードで討つと選べる') : '');
+  else tx = hOpen ? 'ノーマル: 敵の体力-20%・攻撃力-25%・出現数-15%、ボスの体力-25%' : 'ハードは、退魔モードの全ての地の主を討つと、選べるようになる';
   document.querySelectorAll('.dhint').forEach(e => { e.textContent = tx; });
 }
-function pickDiff(d){ if (d === 'hard' && !hardOpen()) return; META.diff = d; saveMeta(); renderDiff(); }
+function pickDiff(d){
+  if (d === 'hard' && !hardOpen()) return;
+  if (d === 'impossible' && !(diffCtx ? impOpenFor(diffCtx.mode, diffCtx.map) : impAny())) return;
+  META.diff = d; saveMeta(); renderDiff();
+}
 document.querySelectorAll('.diffrow button').forEach(b => b.addEventListener('click', () => pickDiff(b.dataset.d)));
 function openMaps(){
-  renderDiff();
+  renderDiff(null);
   const box = $('maplist'); box.innerHTML = '';
   MAPS.forEach((m, i) => {
     const b = document.createElement('button');
     const open = m.ready && mapOpen(i);
     b.className = 'map' + (open ? '' : ' lock');
-    const st = !m.ready ? '準備中' : (!mapOpen(i) ? '未解放' : (mapCleared(i) ? '討伐済み' : '挑戦できる'));
+    const st = !m.ready ? '準備中' : (!mapOpen(i) ? '未解放' : (mapCleared(i) ? '討伐済み(' + bestClear(i) + ')' : '挑戦できる'));
     b.innerHTML = '<div class="h"><span class="no"></span><span class="nm"></span><span class="st"></span></div><div class="ln"></div>';
     b.querySelector('.no').textContent = '第' + (i + 1) + '地';
     b.querySelector('.nm').textContent = m.name;
     b.querySelector('.st').textContent = st;
     b.querySelector('.ln').innerHTML = '<span>主な敵</span> ' + m.enemies + '<br><span>主</span> ' + m.boss + '　<span>解放</span> ' + m.reward + '<br><span>所要</span> 約' + m.min + '分　<span>討伐報酬</span> 小判' + m.clear + '枚' +
-      ((m.ready && !mapOpen(i)) ? '<br><span>解放条件</span> 第' + i + '地「' + MAPS[i - 1].name + '」の主を討つ' : '');
+      ((m.ready && !mapOpen(i)) ? '<br><span>解放条件</span> 第' + i + '地「' + MAPS[i - 1].name + '」の主を討つ' : '') +
+      ((m.ready && mapOpen(i)) ? '<br><span>インポッシブル</span> ' + (impOpenFor('run', i) ? '解禁済み' + (impCleared(i) ? '(討伐済み)' : '') : 'この地の主を、ハードで討つと解禁') : '');
     if (open) b.addEventListener('click', () => openChars('run', i));
     box.appendChild(b);
   });
@@ -2908,7 +2979,7 @@ function openMaps(){
 }
 
 function openChars(mode, mapIdx){
-  pending = { mode, map: mapIdx }; renderDiff();
+  pending = { mode, map: mapIdx }; renderDiff({ mode, map: mapIdx });
   $('charHint').textContent = mode === 'run' ? '第' + (mapIdx + 1) + '地「' + MAPS[mapIdx].name + '」へ向かう者を選ぶ' : '百鬼夜行へ向かう者を選ぶ';
   const box = $('charlist'); box.innerHTML = '';
   CHARS.forEach(c => {
@@ -2970,11 +3041,11 @@ function titleDesc(t){
   switch (c.k){
     case 'kills': return '妖怪を合計' + fmtNum(c.n) + '体倒す';
     case 'play': return c.n >= 3600 ? 'ゲームを合計' + (c.n / 3600) + '時間プレイする' : 'ゲームを合計' + (c.n / 60) + '分プレイする';
-    case 'wn': return c.n >= 11 ? '全種類の武器を、Lv8にする' : '武器を' + c.n + '種類、Lv8にする';
-    case 'wid': return WEAPONS[c.id].n + 'を、Lv8にする';
+    case 'wn': return c.n >= 11 ? '全種類の武器を、Lv5にする' : '武器を' + c.n + '種類、Lv5にする';
+    case 'wid': return WEAPONS[c.id].n + 'を、Lv5にする';
     case 'sn': return c.n >= 5 ? '全種類の妖術(火遁・水遁・風遁・憑依・変わり身の術)を、Lv5にする' : '妖術を' + c.n + '種類、Lv5にする';
     case 'an': return '防具を' + c.n + '種類、Lv5にする';
-    case 'rn': return '巻物を' + c.n + '種類、Lv5にする';
+    case 'rn': return '巻物を' + c.n + '種類、Lv3にする(千手の巻はLv2)';
     case 'arts': return c.n >= 5 ? '5つの奥義を、すべて習得する' : '奥義を習得する';
     case 'map': return '第' + (c.i + 1) + '地「' + MAPS[c.i].name + '」の主を討つ';
     case 'maps': return '全てのマップの主を討つ';
@@ -3029,7 +3100,7 @@ const UPS = {
   jizoku:{ grp:'scroll', n:'持続の巻', max:5, cost:costs(100), eff:n => `常時: 全持続時間+${8 * n}%` },
   heiho:{ grp:'scroll', n:'兵法書', max:5, cost:costs(100), eff:n => `常時: 残魂の獲得+${8 * n}%` },
   uranai:{ grp:'scroll', n:'占術の巻', max:5, cost:costs(400), eff:n => `常時: 選択肢+${n >= 4 ? 2 : (n >= 1 ? 1 : 0)}、ドロップ率+${20 * n}%` },
-  senju:{ grp:'scroll', n:'千手の巻', max:2, cost:[1000, 2800], rare:1, eff:n => `常時: 全武器・全妖術の攻撃回数+${n}(追加分の威力80%)` },
+  senju:{ grp:'scroll', n:'千手の巻', max:2, cost:[1000, 2800], rare:1, eff:n => `常時: 全武器・全妖術の攻撃回数+${n}(追加分は別の場所を攻撃。威力80%)` },
   hp:{ grp:'base', n:'体力', mark:'体', max:5, cost:costs(80), eff:n => `最大HP+${5 * n}%` },
   pickup:{ grp:'base', n:'残魂を拾う範囲', mark:'範', max:5, cost:costs(50), eff:n => `取得範囲+${8 * n}%` },
   speed:{ grp:'base', n:'足腰', mark:'駆', max:5, cost:costs(60), eff:n => `移動速度+${2 * n}%` },
@@ -3055,10 +3126,30 @@ function hireChar(id){
   if (!c || !c.hire || META.hired[id] || META.koban < c.price) return;
   META.koban -= c.price; META.hired[id] = true; saveMeta(); checkTitles(); renderShop();
 }
+let offerMsg = '';
+const OFFER_KINDS = [{ key:'hp', n:'基礎HP', add:'+1', fmt:v => '+' + v }, { key:'atk', n:'基礎攻撃力', add:'+1', fmt:v => '+' + v }, { key:'def', n:'基礎防御力', add:'+0.2', fmt:v => '+' + (v * .2).toFixed(1) }];
+function throwOffering(){
+  if (META.koban < OFFER_COST){ offerMsg = '小判が足りません(' + OFFER_COST + '枚が必要)'; renderShop(); return; }
+  META.koban -= OFFER_COST; const k = OFFER_KINDS[Math.floor(Math.random() * OFFER_KINDS.length)];
+  META.offer[k.key]++; META.offer.n++; saveMeta();
+  offerMsg = '賽銭を投げた… ' + k.n + k.add + ' を得た!'; renderShop();
+}
+function renderOffer(box){
+  const O = META.offer, d = document.createElement('div'); d.className = 'offer';
+  d.innerHTML = '<div class="oh">賽銭箱</div><p class="od"></p><button class="btn" id="bOffer"></button><div class="om"></div><div class="ob"><div class="obt">賽銭欄</div><div class="obr"></div></div>';
+  d.querySelector('.od').textContent = '小判' + OFFER_COST + '枚を投げ入れると、次のどれか1つの効果を、ずっと得られます(どれも同じ確率)。基礎HP+1 ／ 基礎攻撃力+1 ／ 基礎防御力+0.2';
+  const b = d.querySelector('#bOffer'); b.textContent = '賽銭を投げる 小判' + OFFER_COST; b.classList.toggle('dis', META.koban < OFFER_COST); b.addEventListener('click', throwOffering);
+  d.querySelector('.om').textContent = offerMsg;
+  const rows = d.querySelector('.obr'); rows.innerHTML = '';
+  const head = document.createElement('div'); head.className = 'obl'; head.innerHTML = '<span>これまでの賽銭</span><b>' + O.n + '回</b>'; rows.appendChild(head);
+  for (const k of OFFER_KINDS){ const r = document.createElement('div'); r.className = 'obl'; r.innerHTML = '<span>' + k.n + '</span><b>' + k.fmt(O[k.key]) + '</b>'; rows.appendChild(r); }
+  box.appendChild(d);
+}
 function renderShop(){
   $('wallet').textContent = '所持 小判 ' + META.koban + '枚';
-  $('tScroll').classList.toggle('on', shopTab === 'scroll'); $('tBase').classList.toggle('on', shopTab === 'base'); $('tAlly').classList.toggle('on', shopTab === 'ally');
+  $('tScroll').classList.toggle('on', shopTab === 'scroll'); $('tBase').classList.toggle('on', shopTab === 'base'); $('tAlly').classList.toggle('on', shopTab === 'ally'); $('tOffer').classList.toggle('on', shopTab === 'offer');
   const box = $('shoplist'), st = box.scrollTop; box.innerHTML = '';
+  if (shopTab === 'offer'){ renderOffer(box); box.scrollTop = st; return; }
   if (shopTab === 'ally'){
     for (const c of CHARS){
       if (!c.hire) continue;
@@ -3127,9 +3218,13 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+function setPauseInfo(){
+  const mapTx = G.mode === 'end' ? '百鬼夜行' : (G.mapIdx >= 0 && MAPS[G.mapIdx] ? '第' + (G.mapIdx + 1) + '地「' + MAPS[G.mapIdx].name + '」' : '退魔モード');
+  const el = $('pauseInfo'); el.textContent = mapTx; const sp = document.createElement('span'); sp.className = 'pd ' + (G.diffKey || 'normal'); sp.textContent = G.diff ? G.diff.n : ''; el.appendChild(sp);
+}
 function togglePause(){
   if (!G || G.over || G.modal) return;
-  G.paused = !G.paused; $('pause').classList.toggle('hide', !G.paused); bgmSetDuck(G.paused ? .3 : 1);
+  G.paused = !G.paused; if (G.paused) setPauseInfo(); $('pause').classList.toggle('hide', !G.paused); bgmSetDuck(G.paused ? .3 : 1);
   if (retireTimer){ clearTimeout(retireTimer); retireTimer = 0; $('bQuit').textContent = 'リタイア'; $('bQuit').classList.remove('warn'); }
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden && metaDirty) saveMeta(); if (document.hidden && G && !G.over && !G.modal && !G.paused) togglePause(); });
@@ -3155,6 +3250,7 @@ $('mTitles').addEventListener('click', openTitles);
 $('tBack2').addEventListener('click', () => { $('titles').classList.add('hide'); $('title').classList.remove('hide'); refreshTitle(); });
 $('tAll').addEventListener('click', () => { for (const t of TITLES) if (!META.titles[t.id]) earnTitle(t); renderTitles(); });
 $('tScroll').addEventListener('click', () => { shopTab = 'scroll'; renderShop(); });
+$('tOffer').addEventListener('click', () => { shopTab = 'offer'; renderShop(); });
 $('tBase').addEventListener('click', () => { shopTab = 'base'; renderShop(); });
 $('tAlly').addEventListener('click', () => { shopTab = 'ally'; renderShop(); });
 $('sBack').addEventListener('click', () => { $('shop').classList.add('hide'); $('title').classList.remove('hide'); refreshTitle(); });
