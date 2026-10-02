@@ -29,8 +29,9 @@
 }
 :root[data-theme="dark"]{ --night:#0d1221; --ground:#141b30; --moon:#e4eaf1; }
 html{ scroll-padding-top:env(safe-area-inset-top,0px); }
-html,body{ margin:0; height:100%; background:var(--night); color:var(--moon); font-family:var(--font-ui); overflow:hidden; overscroll-behavior:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+html,body{ touch-action:none; margin:0; height:100%; background:var(--night); color:var(--moon); font-family:var(--font-ui); overflow:hidden; overscroll-behavior:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
 #stage{ position:relative; width:100%; height:100%; overflow:hidden; }
+#maplist,#charlist,#shoplist,#titlelist,#setlist,#resStats{ touch-action:pan-y; overscroll-behavior:contain; }
 canvas{ position:absolute; inset:0; width:100%; height:100%; touch-action:none; display:block; }
 .hide{ display:none !important; }
 button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
@@ -57,6 +58,10 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 .chip.empty{ color:rgba(228,234,241,.25); border-style:dashed; }
 .chip.art{ color:#ffd45e; box-shadow:0 0 7px rgba(255,212,94,.7); }
 .chip.rare{ box-shadow:0 0 8px #b393ee; }
+.chip{ position:relative; }
+.chip em{ position:absolute; top:-7px; right:-3px; padding:0 3px; border-radius:6px; background:#1b2a46; border:1px solid #6f9fe0; font-style:normal; font-family:var(--font-ui); font-size:8.5px; font-weight:800; line-height:12px; color:#bcd8ff; white-space:nowrap; }
+.chip.ready{ box-shadow:0 0 9px #7fb4ff; border-color:#a5d0ff; }
+.chip.ready em{ background:#2a4a7e; color:#fff; }
 
 /* banner */
 #toast{ position:absolute; left:0; right:0; top:12%; text-align:center; pointer-events:none; z-index:30; font-family:var(--font-display); font-weight:800; font-size:clamp(20px,6vw,32px); letter-spacing:.14em; color:#f4f7ff; text-shadow:0 0 12px rgba(150,175,255,.95), 0 2px 8px #000; opacity:0; }
@@ -257,7 +262,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
       <div class="setrow"><label for="rBr">光度</label><input type="range" id="rBr" min="1" max="10" step="1"><b id="vBr"></b></div>
       <p class="shint">0は無音です。音量・光度は、5が標準です(光度は1〜10)。</p>
     </div>
-    <div class="row2"><button class="btn" id="sReset">初期値に戻す</button><button class="btn" id="sBack">戻る</button></div>
+    <div class="row2"><button class="btn" id="sReset">初期値に戻す</button><button class="btn" id="setBack">戻る</button></div>
   </section>
 
   <section id="titles" class="screen hide">
@@ -579,9 +584,9 @@ const ART_LV = 30;
 const ARTS = {
   tamakui:{ n:'魂喰らい', ab:'魂', desc:'残魂を拾うたび、HPが回復する(大きな残魂ほど多く回復)。残魂から得る経験値も+20%。残魂が、少しずつ自分に寄ってくる' },
   tenka:{ n:'天下無双', ab:'天', desc:'全ての武器のクールタイムが半分になる' },
-  onmyo:{ n:'陰陽真王', ab:'陰', desc:'全ての妖術のクールタイムが半分になる' },
-  chikurui:{ n:'血狂い', ab:'狂', desc:'妖術が使えなくなる代わりに、武器の枠+3、全ての武器のクールタイム-35%、武器のダメージ+20%' },
-  akuma:{ n:'悪魔付き', ab:'魔', desc:'武器が全て使えなくなる代わりに、妖術「深淵侵食」を習得する' }
+  onmyo:{ n:'陰陽真王', ab:'陰', desc:'武器が全て使えなくなり、レベルアップにも武器は出なくなる。代わりに、全ての妖術のクールタイムが半分になる' },
+  chikurui:{ n:'血狂い', ab:'狂', desc:'妖術が全て使えなくなり、レベルアップにも妖術は出なくなる。代わりに、武器の枠+3、全ての武器のクールタイム-35%、武器のダメージ+20%' },
+  akuma:{ n:'悪魔付き', ab:'魔', desc:'武器が全て使えなくなり、レベルアップにも武器は出なくなる。代わりに、妖術「深淵侵食」を習得する' }
 };
 const CATS = {
   w:{ tag:'武器', col:'#c0392f' }, s:{ tag:'妖術', col:'#2f9d98' },
@@ -622,7 +627,7 @@ const ET = {
   ibaraki:{ n:'茨木童子', hp:1200, spd:1.1, dmg:10, r:1.0, dash:1, boss:1, summon:1, add:'oni', kb:4, drop:[[3,3,1],[2,5,1]], item:'magatama' },
   shuten:{ n:'酒呑童子', hp:3700, spd:1.0, dmg:13, r:1.25, dash:1, boss:1, summon:1, add:'oni', kb:20, drop:[[4,1,1],[1,25,1],[2,8,1]] },
   nue:{ n:'鵺', hp:4000, spd:1.15, dmg:14, r:1.2, dash:1, boss:1, summon:1, add:'hinotama', kb:20, drop:[[4,1,1],[1,25,1],[2,8,1]] },
-  kin:{ n:'金の妖怪', hp:80, spd:2.2, dmg:0, r:.45, flee:1, drop:[[5,1,1]] }
+  kin:{ n:'金の妖怪', hp:80, spd:2.0, dmg:0, r:.45, flee:1, drop:[[5,1,1]] }
 };
 
 /* ================= 状態 ================= */
@@ -821,11 +826,12 @@ function kill(e){
     if (Math.random() > pr) continue;
     for (let i = 0; i < n; i++) spawnSoul(tier, e.x + rnd(-.5, .5), e.y + rnd(-.5, .5));
   }
-  if (T.item){ if (Math.random() < BOSS_ITEM_RATE) spawnItem(T.item, e.x, e.y); }   // ミニボス・中ボスの勾玉は、確実ではなくなった
+  const itemMul = G.cfg.itemMul || 1;   // 第5地は、おにぎり・勾玉が、さらに出にくい
+  if (T.item){ if (Math.random() < BOSS_ITEM_RATE * itemMul) spawnItem(T.item, e.x, e.y); }   // ミニボス・中ボスの勾玉は、確実ではなくなった
   else if (!T.boss){
-    const r = Math.random(), a = (T.mid ? ONIGIRI_MID : ONIGIRI_ZAKO) * dropMul();
+    const r = Math.random(), a = (T.mid ? ONIGIRI_MID : ONIGIRI_ZAKO) * dropMul() * itemMul;
     if (r < a) spawnItem('onigiri', e.x, e.y);
-    else if (r < a + (T.mid ? MAGATAMA_MID : MAGATAMA_ZAKO)) spawnItem('magatama', e.x, e.y);
+    else if (r < a + (T.mid ? MAGATAMA_MID : MAGATAMA_ZAKO) * itemMul) spawnItem('magatama', e.x, e.y);
   }
   // 小判(仮の実装: 拾った数だけ数える。恒久強化の通貨にする予定)
   if (e.final && !T.drop.some(d => d[0] === 4)){
@@ -935,7 +941,7 @@ const EV = {
   tsukiyo:{ n:'月夜', f(){ G.moonT = G.t + 25; } },
   fog:{ n:'濃霧', f(){ G.fogT = G.t + 25; } },
   shield:{ n:'守りの結界', f(){ G.zones.push({ kind:'sanct', x: G.p.x, y: G.p.y, r: 3.6, life: 25, tickT: 0 }); } },
-  kin:{ n:'金の妖怪', f(){ const q = ringPos(0); spawnEnemy('kin', q.x, q.y, { life: 30 }); } },
+  kin:{ n:'金の妖怪', f(){ const q = ringPos(-2.2); spawnEnemy('kin', q.x, q.y, { life: 30 }); banner('金の妖怪、出現! 逃げる前に倒せ', 'good'); } },
   wave:{ n:'百鬼の大波', boss:1, f(){
     // 8方向から、0.5秒ごとに14回、どんどん湧き出して押し寄せる(時間が進むほど、1回の数が増える)
     const m = vsec() / 60, per = 2 + Math.floor(m / 10), dn = G.cfg.density || 1;
@@ -1042,7 +1048,7 @@ MAPCFG.push(
 );
 /* マップごとの設定: 1マップは、イベント20回(後半は30回)×30秒 = 10分(後半は15分)。
    timeScale=敵が強くなる時間の進み方(実際の時間の何倍で進むか)、hard=敵の体力・攻撃力の倍率、density=敵の密度 */
-MAPCFG.forEach((c, i) => { c.steps = i >= 3 ? 30 : 20; c.stepSec = 30; c.minutes = c.steps * c.stepSec / 60; c.timeScale = i >= 3 ? 1.7 : 1.4; c.hard = 1.0; c.density = [1, 1.12, 1.25, 1.4, 1.55][i]; c.capAdd = [0, 20, 40, 70, 100][i]; });
+MAPCFG.forEach((c, i) => { c.steps = i >= 3 ? 30 : 20; c.stepSec = 30; c.minutes = c.steps * c.stepSec / 60; c.timeScale = i >= 3 ? 1.7 : 1.4; c.hard = 1.0; c.itemMul = i === 4 ? .35 : 1; c.density = [1, 1.12, 1.25, 1.4, 1.55][i]; c.capAdd = [0, 20, 40, 70, 100][i]; });
 const CFG_END = {
   band:['chochin','gaikotsu','oni','karakasa'],
   pool: m => { const w = MAPCFG[0].pool(m).slice(); if (m >= 5){ w.push(['gaikotsu', 3]); w.push(['rokuroM', .3 + .03 * m]); } return w; },
@@ -1298,7 +1304,7 @@ function playerHit(e){
     return;
   }
   p.hp -= e.dmg * dmgScale() * (1 - .05 * (p.armor.yoroi || 0)) * (1 - .02 * bu('guard')) * p.ch.taken;
-  p.invT = CFG.baseInvuln + .1 * (p.armor.kote || 0) + .02 * bu('invuln') + p.ch.inv;
+  p.invT = CFG.baseInvuln + .1 * (p.armor.kote || 0) + .06 * bu('invuln') + p.ch.inv;
   p.hitFlash = .15;
 }
 function updateEnemies(dt){
@@ -1317,7 +1323,7 @@ function updateEnemies(dt){
       if (e.life <= 0 || d > rr + 14){ e.dead = true; continue; }
     } else if (e.flee){
       e.x -= e.dx * sp * dt; e.y -= e.dy * sp * dt; e.life -= dt;
-      if (e.life <= 0 || d > rr + 12){ e.dead = true; continue; }
+      if (e.life <= 0 || d > rr + 16){ e.dead = true; continue; }
     } else {
       let ux = e.dx, uy = e.dy, v = sp;
       const T = ET[e.type];
@@ -1345,6 +1351,10 @@ function updateEnemies(dt){
         if (bd > b.r - e.r){ e.x = b.x + bx / bd * (b.r - e.r); e.y = b.y + by / bd * (b.r - e.r); }
       }
       if (!e.boss && d > rr + 10){ const q = ringPos(rnd(0, 1.5)); e.x = q.x; e.y = q.y; }
+      else if (e.boss && !G.barrier && d > rr + 5){   // 離れすぎたボスは、自分をはさんで反対側の、画面の外から、回り込んで出てくる
+        const R = rr + .6; e.x = p.x - (e.x - p.x) / d * R; e.y = p.y - (e.y - p.y) / d * R; e.st = 0; e.stT = rnd(1.5, 3);
+        G.fx.push({ k:'ring', x: e.x, y: e.y, R: 1.6, life: .45, max: .45, col:'#ff6a5a' });
+      }
     }
     if (!e.flee && e.dmg > 0 && d < e.r + .33) playerHit(e);
   }
@@ -1484,7 +1494,7 @@ function updateZones(dt){
     if (z.life <= 0){ G.zones[i] = G.zones[G.zones.length - 1]; G.zones.pop(); }
   }
 }
-const MAGATAMA_SEC = 5, TAMAKUI_DRIFT = 1.8;   // 勾玉の効果の長さ(秒)、魂喰らいで残魂が寄ってくる速さ(マス/秒)
+const MAGATAMA_SEC = 5, TAMAKUI_DRIFT = .9;   // 勾玉の効果の長さ(秒)、魂喰らいで残魂が寄ってくる速さ(マス/秒)
 function updateSouls(dt){
   const p = G.p, pr = pickupR(), hx = hw(), hy = hh();
   const mag = (G.magT || 0) > 0; if (mag) G.magT -= dt;
@@ -1562,7 +1572,7 @@ function buildChoices(){
   for (const s of p.spells) if (s.lv < 5) groups.s.push({ k:'s', id: s.id });
   if (p.spells.length < 3) for (const id in SPELLS) if (!p.spells.some(s => s.id === id) && !SPELLS[id].hidden && !isLocked('s', id)) groups.s.push({ k:'s', id });
   if (p.art === 'chikurui') groups.s.length = 0;   // 血狂い: 妖術は使えない
-  if (p.art === 'akuma') groups.w.length = 0;      // 悪魔付き: 武器は使えない
+  if (p.art === 'akuma' || p.art === 'onmyo') groups.w.length = 0;      // 悪魔付き・陰陽真王: 武器は使えない(レベルアップにも出ない)
   for (const id in ARMOR){ const l = p.armor[id] || 0; if (l < 5 && (l > 0 || (Object.keys(p.armor).length < ARMOR_SLOTS && !isLocked('a', id)))) groups.a.push({ k:'a', id }); }
   const normalScr = Object.keys(SCROLLS).filter(id => id !== 'senju'), used = Object.keys(p.scrolls).length;
   for (const id of normalScr){ const l = p.scrolls[id] || 0; if (l < 5 && (l > 0 || (used < 5 && !isLocked('r', id)))) groups.r.push({ k:'r', id }); }
@@ -1615,7 +1625,8 @@ function trackMax(c){
 function applyArt(id){
   const p = G.p; p.art = id;
   if (id === 'chikurui'){ p.spells = []; p.hasSub = false; p.sub = { ready:false, t:0 }; p.windT = 0; p.buffT = 0; }
-  if (id === 'akuma'){ p.weapons = []; p.spells.push({ id:'shinen', lv:1, t:0 }); }
+  if (id === 'akuma'){ p.weapons = []; G.spins = []; p.spells.push({ id:'shinen', lv:1, t:0 }); }
+  if (id === 'onmyo'){ p.weapons = []; G.spins = []; }   // 陰陽真王: 武器を取り上げる(妖術だけで戦う)
   renderSlots();
 }
 function chooseArt(id){
@@ -1623,7 +1634,8 @@ function chooseArt(id){
   $('lvup').classList.add('hide'); $('lvTitle').textContent = '力 を 得 る';
 }
 function showArt(){
-  const p = G.p, ids = Object.keys(ARTS).filter(id => !(id === 'onmyo' && !p.spells.length));
+  // 出しても意味がない奥義は、選択肢に出さない: 陰陽真王=妖術がないと出ない / 天下無双・血狂い=武器がないと出ない
+  const p = G.p, ids = Object.keys(ARTS).filter(id => !(id === 'onmyo' && !p.spells.length) && !((id === 'tenka' || id === 'chikurui') && !p.weapons.length));
   for (let i = ids.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
   const offer = ids.slice(0, 2); G.artOffer = offer;
   G.modal = true; G.paused = true;
@@ -1671,10 +1683,11 @@ function renderSlots(){
     const d = document.createElement('div'); d.className = 'chip ' + cls + (rare ? ' rare' : '');
     if (ICON_IMG[id]){ const im = document.createElement('img'); im.src = ICON_IMG[id]; im.alt = ab; im.draggable = false; d.appendChild(im); }
     else d.appendChild(document.createTextNode(ab));
-    const sm = document.createElement('small'); sm.textContent = lv; d.appendChild(sm); box.appendChild(d);
+    const sm = document.createElement('small'); sm.textContent = lv; d.appendChild(sm); box.appendChild(d); return d;
   };
+  G.subChip = null; G.subEm = null; G.subEmTxt = null;
   p.weapons.forEach(w => add('weapon', w.id, WEAPONS[w.id].ab, w.lv));
-  p.spells.forEach(sp => add('spell', sp.id, SPELLS[sp.id].ab, sp.lv));
+  p.spells.forEach(sp => { const d = add('spell', sp.id, SPELLS[sp.id].ab, sp.lv); if (sp.id === 'kawarimi'){ const em = document.createElement('em'); d.appendChild(em); G.subChip = d; G.subEm = em; } });
   for (const id in p.armor) add('armor', id, ARMOR[id].ab, p.armor[id]);
   for (const id in p.scrolls) add('scroll', id, SCROLLS[id].ab, p.scrolls[id], SCROLLS[id].rare);
   if (p.art) add('art', 'art_' + p.art, ARTS[p.art].ab, '奥');
@@ -1689,6 +1702,11 @@ function updateHud(){
   setTxt('clock', String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0'));
   { const fb = G.finalBoss; const on = !!(fb && !fb.dead && fb.hp > 0 && !G.cine); $('bossbar').classList.toggle('hide', !on);
     if (on){ setTxt('bossName', ET[fb.type].n); setTxt('bossPct', Math.max(1, Math.ceil(fb.hp / fb.mhp * 100)) + '%'); $('bossFill').style.transform = 'scaleX(' + clamp(fb.hp / fb.mhp, 0, 1) + ')'; } }
+  if (G.subChip && p.sub){   // 変わり身の術: 待機中は「待機」、準備中は、残りの秒数
+    const rd = !!p.sub.ready, tx = rd ? '待機' : Math.ceil(Math.max(0, p.sub.t)) + '秒';
+    if (G.subEmTxt !== tx){ G.subEmTxt = tx; G.subEm.textContent = tx; }
+    G.subChip.classList.toggle('ready', rd);
+  }
   setTxt('cKills', '討伐 ' + G.kills.toLocaleString('ja-JP'));
   setTxt('cKoban', '小判 ' + G.koban.toLocaleString('ja-JP'));
   $('xpfill').style.width = (clamp(p.xp / need(p.lv), 0, 1) * 100) + '%';
@@ -2055,6 +2073,15 @@ const SPRITES = {};
     im.src = SPRITE_SRC[id];
   }
 })();
+/* 変わり身の術が待機中のとき: 青い光の膜と、回る点線のリングを出して、はっきり分かるようにする */
+function drawSubReady(x, y, r){
+  const t = G.t, pu = .5 + .5 * Math.sin(t * 5);
+  ctx.save();
+  ctx.fillStyle = 'rgba(127,180,255,' + (.10 + .07 * pu) + ')'; ctx.beginPath(); ctx.arc(x, y, r * 2.1, 0, TAU); ctx.fill();
+  ctx.strokeStyle = 'rgba(165,208,255,' + (.7 + .3 * pu) + ')'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, y, r * 2.1, 0, TAU); ctx.stroke();
+  ctx.strokeStyle = 'rgba(205,228,255,.6)'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 8]); ctx.lineDashOffset = -t * 28; ctx.beginPath(); ctx.arc(x, y, r * 2.7, 0, TAU); ctx.stroke();
+  ctx.restore();
+}
 function drawPlayer(){
   const p = G.p, x = W / 2, y = H / 2, r = .38 * U;
   if (p.invT > 0 && Math.floor(G.t * 20) % 2 === 0) ctx.globalAlpha = .45;
@@ -2067,7 +2094,7 @@ function drawPlayer(){
   const spr = SPRITES[G.charId];
   if (spr){
     ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(x, y + r * 1.35, r * 1.2, r * .4, 0, 0, TAU); ctx.fill();
-    if (p.hasSub && p.sub.ready){ ctx.strokeStyle = 'rgba(127,180,255,.85)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r * 1.9, 0, TAU); ctx.stroke(); }
+    if (p.hasSub && p.sub.ready) drawSubReady(x, y, r);
     if (p.buffT > 0){ ctx.strokeStyle = 'rgba(255,120,200,.7)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r * 1.65 + Math.sin(G.t * 8) * 2, 0, TAU); ctx.stroke(); }
     // 向き(攻撃方向)の目印
     const fa = Math.atan2(p.face.y, p.face.x), fr = r * 2.5;
@@ -2427,6 +2454,29 @@ function drawTitleScene(ts){
   ctx.restore();
   ctx.drawImage(vig, 0, 0, W, H);
 }
+/* ボス(と金の妖怪)が画面の外にいるとき、画面のふちに矢印と距離を出す */
+function edgePoint(dx, dy, pad, topPad){
+  const cx = W / 2, cy = H / 2; let k = Infinity;
+  if (dx > 0) k = Math.min(k, (W - pad - cx) / dx); else if (dx < 0) k = Math.min(k, (pad - cx) / dx);
+  if (dy > 0) k = Math.min(k, (H - pad - cy) / dy); else if (dy < 0) k = Math.min(k, (topPad - cy) / dy);
+  return { x: cx + dx * k, y: cy + dy * k };
+}
+function drawOffscreen(){
+  const p = G.p; ctx.save(); ctx.textAlign = 'center'; ctx.lineJoin = 'round';
+  for (const e of G.enemies){
+    if (e.dead || !(e.boss || e.type === 'kin')) continue;
+    const x = sx(e.x), y = sy(e.y), rr = e.r * U;
+    if (x > -rr && x < W + rr && y > -rr && y < H + rr) continue;
+    const dx = x - W / 2, dy = y - H / 2, a = Math.atan2(dy, dx), pt = edgePoint(dx, dy, 30, 122), col = e.type === 'kin' ? '#ffd45e' : '#ff6a5a';
+    ctx.save(); ctx.translate(pt.x, pt.y); ctx.rotate(a); ctx.globalAlpha = .78 + .22 * Math.sin(G.t * 8);
+    ctx.fillStyle = col; ctx.strokeStyle = 'rgba(0,0,0,.75)'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(-9, -11); ctx.lineTo(-4, 0); ctx.lineTo(-9, 11); ctx.closePath(); ctx.stroke(); ctx.fill(); ctx.restore();
+    const lx = pt.x - Math.cos(a) * 30, ly = pt.y - Math.sin(a) * 30, dist = Math.round(Math.hypot(e.x - p.x, e.y - p.y));
+    ctx.font = '800 11px "Zen Kaku Gothic New", sans-serif'; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(5,8,18,.9)'; ctx.fillStyle = col;
+    const label = (e.type === 'kin' ? '金' : ET[e.type].n) + ' ' + dist + 'm'; ctx.strokeText(label, lx, ly + 4); ctx.fillText(label, lx, ly + 4);
+  }
+  ctx.restore();
+}
 function render(){
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   if (!G){ SHK.x = SHK.y = 0; drawTitleScene(lastTs); return; }
@@ -2470,6 +2520,7 @@ function render(){
     }
     ctx.restore();
   }
+  drawOffscreen();
   ctx.drawImage(vig, 0, 0, W, H);
   if (stick.on){
     ctx.strokeStyle = 'rgba(228,234,241,.45)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(stick.ox, stick.oy, 56, 0, TAU); ctx.stroke();
@@ -2489,8 +2540,8 @@ function startGame(mode, charId, mapIdx){
 }
 /* 百鬼夜行: 生き延びた分数に比例して、小判をもらえる(1分あたり10枚) */
 const END_REWARD_PER_MIN = 10;
-const ONIGIRI_ZAKO = .0007, ONIGIRI_MID = .007, MAGATAMA_ZAKO = .0009, MAGATAMA_MID = .009, BOSS_ITEM_RATE = .55;   // 敵1体あたりの、おにぎり・勾玉のドロップ率
-const KOBAN_ZAKO = .003, KOBAN_MID = .04;   // 敵1体あたりの、小判のドロップ率(雑魚0.3%、中型4%)
+const ONIGIRI_ZAKO = .0010, ONIGIRI_MID = .010, MAGATAMA_ZAKO = .0009, MAGATAMA_MID = .009, BOSS_ITEM_RATE = .55;   // 敵1体あたりの、おにぎり・勾玉のドロップ率
+const KOBAN_ZAKO = .006, KOBAN_MID = .08;   // 敵1体あたりの、小判のドロップ率(雑魚0.3%、中型4%)
 function endlessReward(){
   if (!G || G.mode !== 'end' || G.survDone) return; G.survDone = true;
   G.survReward = Math.round(G.t / 60 * END_REWARD_PER_MIN); G.koban += G.survReward;   // 6秒ごとに1枚
@@ -2817,7 +2868,7 @@ function openSettings(from){
 function closeSettings(){ $('settings').classList.add('hide'); $(setFrom).classList.remove('hide'); saveMeta(); }
 $('bSet').addEventListener('click', () => openSettings('title'));
 $('bSet2').addEventListener('click', () => openSettings('pause'));
-$('sBack').addEventListener('click', closeSettings);
+$('setBack').addEventListener('click', closeSettings);
 $('sReset').addEventListener('click', () => { META.settings = defSettings(); renderSettings(); applyBright(); applyBgmVol(); saveMeta(); });
 $('rBgm').addEventListener('input', e => { META.settings.bgm = +e.target.value; $('vBgm').textContent = META.settings.bgm; applyBgmVol(); });
 $('rSe').addEventListener('input', e => { META.settings.se = +e.target.value; $('vSe').textContent = META.settings.se; });
@@ -2906,7 +2957,7 @@ const UPS = {
   speed:{ grp:'base', n:'足腰', mark:'駆', max:5, cost:costs(60), eff:n => `移動速度+${2 * n}%` },
   guard:{ grp:'base', n:'打たれ強さ', mark:'防', max:5, cost:costs(70), eff:n => `被ダメージ-${2 * n}%` },
   regen:{ grp:'base', n:'自然治癒', mark:'癒', max:5, cost:costs(60), eff:n => `毎秒、最大HPの${fmtN(.1 * n)}%を回復` },
-  invuln:{ grp:'base', n:'見切り', mark:'見', max:5, cost:costs(70), eff:n => `無敵時間+${fmtN(.02 * n)}秒` },
+  invuln:{ grp:'base', n:'見切り', mark:'見', max:5, cost:costs(70), eff:n => `無敵時間+${fmtN(.06 * n)}秒` },
   soulgain:{ grp:'base', n:'魂を集める力', mark:'魂', max:5, cost:costs(80), eff:n => `残魂の獲得量+${3 * n}%` },
   heal:{ grp:'base', n:'腹ごしらえ', mark:'飯', max:5, cost:costs(40), eff:n => `おにぎりの回復量 ${30 + 3 * n}%` },
   power:{ grp:'base', n:'基礎攻撃力', mark:'撃', max:5, cost:costs(100), eff:n => `全ダメージ+${2 * n}%` }
@@ -3010,6 +3061,8 @@ $('title').addEventListener('click', e => {
   const r = cv.getBoundingClientRect(); titleTap(e.clientX - r.left, e.clientY - r.top);
 });
 ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => document.addEventListener(ev, audioUnlock, { passive:true }));
+// 指で引っぱる操作(下へスワイプ)で、ブラウザが再読み込みしないようにする。一覧のスクロールと、スライダーは、そのまま使える
+document.addEventListener('touchmove', e => { if (e.target && e.target.closest && e.target.closest('#maplist,#charlist,#shoplist,#titlelist,#setlist,#resStats,input')) return; if (e.cancelable) e.preventDefault(); }, { passive:false });
 document.addEventListener('visibilitychange', () => { const c = SFX.ctx; if (!c) return; try { if (document.hidden) c.suspend(); else c.resume(); } catch (_) {} });
 document.addEventListener('click', e => { if (e.target && e.target.closest && e.target.closest('button')) sfxClick(); }, true);   // ボタンを押した音   // 最初の操作で、音の準備をしておく
 $('mRun').addEventListener('click', openMaps);
