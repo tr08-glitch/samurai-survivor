@@ -119,6 +119,8 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 .setrow b{ flex:0 0 2em; text-align:right; font-size:18px; font-family:var(--font-display); }
 .shint{ margin:8px 4px 0; font-size:11.5px; color:var(--moon-dim); line-height:1.6; }
 #pauseInfo{ margin:0 0 16px; font-size:15px; line-height:1.8; text-align:center; color:var(--moon); }
+#pauseNote{ margin:-6px 0 14px; font-size:12.5px; line-height:1.6; text-align:center; color:#9ad8a0; max-width:320px; }
+#pauseNote:empty{ display:none; }
 #pauseInfo .pcrit{ font-size:12.5px; color:var(--moon-dim); margin-top:2px; }
 #pauseInfo .pd{ display:inline-block; margin-left:8px; padding:1px 10px; border:1px solid currentColor; border-radius:3px; font-size:13px; font-weight:800; }
 #pauseInfo .pd.normal{ color:#9ad8a0; } #pauseInfo .pd.hard{ color:#ffd45e; } #pauseInfo .pd.impossible{ color:#ff8a7a; } #pauseInfo .pd.crazy{ color:#ff6adf; }
@@ -160,8 +162,8 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 .pt img{ width:100%; height:100%; object-fit:cover; object-position:top center; display:block; -webkit-user-drag:none; pointer-events:none; }
 .pt .ph{ font-family:var(--font-display); font-weight:800; font-size:42px; color:rgba(228,234,241,.55); }
 .map.lock .pt img{ filter:brightness(0) opacity(.65); }
-.tabs{ display:flex; gap:6px; margin:0 0 10px; flex:0 0 auto; }
-.tabs button{ padding:7px 14px; border-radius:4px; border:1px solid rgba(228,234,241,.3); background:rgba(13,18,33,.9); font-weight:700; font-size:14px; }
+.tabs{ display:flex; flex-wrap:wrap; gap:6px; margin:0 0 10px; flex:0 0 auto; }
+.tabs button{ padding:7px 12px; border-radius:4px; border:1px solid rgba(228,234,241,.3); background:rgba(13,18,33,.9); font-weight:700; font-size:14px; }
 .tabs button.on{ border-color:var(--kin); color:var(--kin); background:rgba(216,180,90,.12); }
 .up{ display:flex; gap:12px; align-items:center; padding:10px 12px; border-radius:4px; border:1px solid rgba(228,234,241,.28); border-left:6px solid var(--kin); background:var(--panel); flex:0 0 auto; }
 .up .ic{ flex:0 0 46px; height:46px; border-radius:4px; border:1px solid var(--kin); background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:22px; color:var(--kin); }
@@ -305,7 +307,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
   <section id="shop" class="screen hide">
     <h2>強化</h2>
     <div class="wallet" id="wallet"></div>
-    <div class="tabs"><button id="tScroll" class="on">巻物</button><button id="tBase">基礎力</button><button id="tAlly">雇用</button><button id="tOffer">賽銭</button></div>
+    <div class="tabs"><button id="tScroll" class="on">巻物</button><button id="tBase">基礎力</button><button id="tSpecial">特殊</button><button id="tAlly">雇用</button><button id="tOffer">賽銭</button></div>
     <div id="shoplist"></div>
     <div class="row3"><button class="btn" id="sBack">戻る</button><button class="btn sm" id="sCheat">試遊用:小判+1000</button></div>
   </section>
@@ -319,6 +321,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
   <section id="pause" class="screen hide">
     <h2 style="font-family:var(--font-display);letter-spacing:.2em;margin:0 0 8px">一時停止</h2>
     <p id="pauseInfo"></p>
+    <p id="pauseNote"></p>
     <div class="row2"><button class="btn" id="bResume">再開</button><button class="btn" id="bSet2">設定</button><button class="btn" id="bQuit">リタイア</button></div>
   </section>
 
@@ -707,7 +710,10 @@ const need = lv => { const n = lv - 1; return Math.round((10 + 5*n + .5*n*n) * (
 const OFFER_COST = 100;
 const offHp = () => META.offer.hp, offAtk = () => META.offer.atk, offDef = () => META.offer.def * .2;
 const maxHp = () => (CFG.playerHP + offHp()) * (1 + .1 * (G.p.armor.kabuto || 0)) * G.p.ch.hp * (1 + .05 * bu('hp')) * (1 + tb('hp'));
-const gDmg = () => (1 + .05 * sl('goriki')) * (1 + .02 * bu('power')) * (1 + tb('dmg'));
+/* 無限の証明(強化の特殊): ゲームで遊んだ時間(タイトルなどは含まない)が、10分たつごとに、全ダメージ+0.1% */
+const MUGEN_STEP = 600, MUGEN_PER = .001, FOODCASH_KOBAN = 3;
+const mugenBonus = () => bu('mugen') ? MUGEN_PER * Math.floor((META.stats.play || 0) / MUGEN_STEP) : 0;
+const gDmg = () => (1 + .05 * sl('goriki')) * (1 + .02 * bu('power')) * (1 + tb('dmg')) * (1 + mugenBonus());
 const lowMul = () => (G.p.ch.low && G.p.hp <= maxHp() * .5) ? 1.2 : 1;
 const gWDmg = () => gDmg() * G.p.ch.wd * lowMul() * (hasArt('chikurui') ? 1.2 : 1) * (hasArt('tenka') ? 1.5 : 1);   // 天下無双: 武器の火力+50%
 const gSDmg = () => gDmg() * G.p.ch.sd * lowMul() * (1 + tb('sdmg')) * (hasArt('onmyo') ? 1.5 : 1);   // 陰陽真王: 妖術の火力+50%
@@ -903,7 +909,7 @@ function kill(e){
     for (let i = 0; i < n; i++) spawnSoul(tier, e.x + rnd(-.5, .5), e.y + rnd(-.5, .5));
   }
   const itemMul = G.cfg.itemMul || 1;   // 第5地は、おにぎり・勾玉が、さらに出にくい
-  if (e.type === 'kin'){ const nk = Math.round(KIN_KOBAN * dropMul()); for (let i = 0; i < nk; i++) spawnItem('koban', e.x + rnd(-.9, .9), e.y + rnd(-.9, .9)); }   // 金の妖怪は、小判もたくさん落とす
+  if (e.type === 'kin'){ const nk = Math.round(KIN_KOBAN * dropMul()); for (let i = 0; i < nk; i++) spawnItem('koban', e.x + rnd(-1.5, 1.5), e.y + rnd(-1.5, 1.5)); }   // 金の妖怪は、小判をたくさん落とす(拾いやすいよう、少し広めに散らす)
   if (T.item){ if (Math.random() < BOSS_ITEM_RATE * itemMul) spawnItem(T.item, e.x, e.y); }   // ミニボス・中ボスの勾玉は、確実ではなくなった
   else if (!T.boss){
     const r = Math.random(), a = (T.mid ? ONIGIRI_MID : ONIGIRI_ZAKO) * dropMul() * itemMul;
@@ -1694,7 +1700,11 @@ function updateItems(dt){
       else if (d < pickupR() * .8){ it.x += (p.x - it.x) / d * 10 * dt; it.y += (p.y - it.y) / d * 10 * dt; }
     }
     if (d < .9){
-      if (it.type === 'onigiri'){ sfxHeal(); p.hp = Math.min(maxHp(), p.hp + maxHp() * (.3 + .03 * bu('heal'))); G.fx.push({ k:'ring', x: p.x, y: p.y, R: 1.2, life: .5, max: .5, col:'#9ad8a0' }); }
+      if (it.type === 'onigiri'){
+        if (bu('foodcash') && p.hp >= maxHp() - .001){   // 食料換金: HPが最大のときは、回復の代わりに、小判3枚
+          G.koban += FOODCASH_KOBAN; sfxClick(); G.fx.push({ k:'ring', x: p.x, y: p.y, R: 1.2, life: .5, max: .5, col:'#e9c35f' });
+        } else { sfxHeal(); p.hp = Math.min(maxHp(), p.hp + maxHp() * (.3 + .03 * bu('heal'))); G.fx.push({ k:'ring', x: p.x, y: p.y, R: 1.2, life: .5, max: .5, col:'#9ad8a0' }); }
+      }
       else if (it.type === 'koban'){ G.koban++; G.fx.push({ k:'ring', x: it.x, y: it.y, R: .6, life: .3, max: .3, col:'#e9c35f' }); }
       else {
         for (const s of G.souls){ if (Math.abs(s.x - p.x) <= hx * 1.5 && Math.abs(s.y - p.y) <= hy * 1.5){ s.att = true; s.fast = true; } }
@@ -1820,7 +1830,7 @@ function doReroll(){
   META.koban -= cost; metaDirty = true; saveMeta(); if (art) G.artRerolls++; else G.rerolls++;
   if (art) showArt(); else openLevelUp();
 }
-function showArt(){
+function showArt(keep){
   // 出しても意味がない奥義は、選択肢に出さない: 陰陽真王=妖術がないと出ない / 天下無双・血狂い=武器がないと出ない
   const p = G.p, own = [p.art, p.art2].filter(Boolean);
   const ids = Object.keys(ARTS).filter(id => !own.includes(id) && !ART_EXCL.some(([a, b]) => (id === a && own.includes(b)) || (id === b && own.includes(a)))
@@ -1829,6 +1839,7 @@ function showArt(){
   for (let i = ids.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
   let offer = ids.slice(0, 2); const prev = G.artOffer || [];
   if (ids.length > 2 && G.lvMode === 'art' && offer.every(x => prev.includes(x))) offer = ids.slice(1, 3);   // リロールしたときは、前と同じ組み合わせにならないようにする
+  if (keep && prev.length && prev.every(id => ARTS[id])) offer = prev.slice();   // 復帰したときは、保存しておいた、同じ奥義を出す
   G.artOffer = offer; G.lvMode = 'art';
   G.modal = true; G.paused = true;
   $('lvTitle').textContent = G.p.art ? '二 つ 目 の 奥 義' : '奥 義 を 選 べ';
@@ -1844,10 +1855,12 @@ function showArt(){
   }
   updateRerollUI(); $('lvup').classList.remove('hide');
 }
-function openLevelUp(){
+function openLevelUp(saved){
   G.modal = true; G.paused = true; G.lvMode = 'lv'; $('lvTitle').textContent = '力 を 得 る';
   const box = $('cards'); box.innerHTML = '';
-  for (const c of buildChoices()){
+  const list = Array.isArray(saved) && saved.length ? saved : buildChoices();   // 復帰したときは、保存しておいた、同じ選択肢を出す
+  G.lvChoices = list.map(c => ({ k: c.k, id: c.id }));
+  for (const c of list){
     const inf = cardInfo(c), cat = CATS[c.k];
     const b = document.createElement('button');
     b.className = 'card' + (inf.rare ? ' rare' : ''); b.style.setProperty('--cc', cat.col);
@@ -2733,11 +2746,12 @@ function startGame(mode, charId, mapIdx){
   $('hud').classList.remove('hide');
   hudCache = {};
   banner(mode === 'run' ? '退魔、開始' : '百鬼夜行、開始', 'warn');
+  if (bu('shitaku')){ G.pendingLv = 1; openLevelUp(); }   // 出陣の支度: 開始の前に、選択を1回(レベルは、上がらない)
 }
 /* 百鬼夜行: 生き延びた分数に比例して、小判をもらえる(1分あたり10枚) */
 const END_REWARD_PER_MIN = 10;
 const ONIGIRI_ZAKO = .0010, ONIGIRI_MID = .010, MAGATAMA_ZAKO = .0009, MAGATAMA_MID = .009, BOSS_ITEM_RATE = .55;   // 敵1体あたりの、おにぎり・勾玉のドロップ率
-const KIN_KOBAN = 8;   // 金の妖怪が落とす小判の数(占術の巻で増える)
+const KIN_KOBAN = 30;   // 金の妖怪が落とす小判の数(占術の巻で増える)
 const KOBAN_ZAKO = .006, KOBAN_MID = .08;   // 敵1体あたりの、小判のドロップ率(雑魚0.3%、中型4%)
 function endlessReward(){
   if (!G || G.mode !== 'end' || G.survDone) return; G.survDone = true;
@@ -2747,7 +2761,7 @@ function endlessReward(){
 function bankKoban(){ if (G && !G.banked){ G.banked = true; META.koban += G.koban; META.stats.kobanAll += G.koban; saveMeta(); checkTitles(); } }
 function endGame(){
   if (G.over) return;
-  G.over = true; sfxStopMag(); bgmWant(null, { fadeOut: 2.5 }); G.cine = null; $('cine').classList.remove('on'); endlessReward(); bankKoban();
+  G.over = true; clearRunSave(); sfxStopMag(); bgmWant(null, { fadeOut: 2.5 }); G.cine = null; $('cine').classList.remove('on'); endlessReward(); bankKoban();
   if (G.mode === 'end') META.stats.endBest = Math.max(META.stats.endBest, Math.floor(G.t / 60));
   checkTitles(); saveMeta();
   const s = Math.floor(G.t), mm = Math.floor(s / 60), ss = s % 60;
@@ -2773,7 +2787,7 @@ function retireClick(){   // うっかり押さないよう、2回押したと�
   clearTimeout(retireTimer); retireTimer = 0; b.textContent = 'リタイア'; b.classList.remove('warn'); retire();
 }
 function toTitle(){
-  sfxStopMag(); bgmWant('title', { fadeIn: 2, fadeOut: 1.2 }); bgmSetDuck(1);
+  clearRunSave(); sfxStopMag(); bgmWant('title', { fadeIn: 2, fadeOut: 1.2 }); bgmSetDuck(1);
   if (G){ G.cine = null; } $('cine').classList.remove('on'); $('bossbar').classList.add('hide');
   if (G && !G.over){ endlessReward(); bankKoban(); }
   G = null; ['hud', 'maps', 'chars', 'shop', 'titles', 'settings', 'result', 'pause', 'lvup', 'dbg'].forEach(id => $(id).classList.add('hide'));
@@ -3215,6 +3229,10 @@ const UPS = {
   soulgain:{ grp:'base', n:'魂を集める力', mark:'魂', max:5, cost:costs(80), eff:n => `残魂の獲得量+${3 * n}%` },
   heal:{ grp:'base', n:'腹ごしらえ', mark:'飯', max:5, cost:costs(40), eff:n => `おにぎりの回復量 ${30 + 3 * n}%` },
   power:{ grp:'base', n:'基礎攻撃力', mark:'撃', max:5, cost:costs(100), eff:n => `全ダメージ+${2 * n}%` },
+  /* 特殊: 1回買うと、ずっと有効 */
+  foodcash:{ grp:'special', n:'食料換金', mark:'換', max:1, cost:[2000], eff:n => n ? 'HPが最大のときに、おにぎりを拾うと、回復の代わりに、小判3枚を得る' : '効果なし' },
+  mugen:{ grp:'special', n:'無限の証明', mark:'証', max:1, cost:[10000], eff:n => n ? '遊んだ時間10分ごとに、全ダメージ+0.1%(今は 合計' + fmtN((META.stats.play || 0) / 3600) + '時間 → +' + fmtN(mugenBonus() * 100) + '%)' : '効果なし(買うと、遊んだ時間10分ごとに、全ダメージ+0.1%)' },
+  shitaku:{ grp:'special', n:'出陣の支度', mark:'支', max:1, cost:[1500], eff:n => n ? 'ゲームの開始時に、レベルアップの選択を、1回、先に得る(レベルは上がらない)' : '効果なし' },
   /* 隠し: 同じ分類の強化を、全部、最大にすると、現れる */
   choetsu:{ grp:'scroll', hidden:1, n:'超越の書', mark:'越', max:1, cost:[15000], rare:1, eff:n => n ? '常時: 武器・妖術の最大レベル+4(Lv12まで)' : '効果なし' },
   majin:{ grp:'base', hidden:1, n:'魔人', mark:'魔', max:1, cost:[15000], rare:1, eff:n => n ? '常時: 防具の最大レベル+2。倒れたとき、1度だけHP半分で蘇る(無敵' + MAJIN_INV + '秒)' : '効果なし' }
@@ -3256,7 +3274,7 @@ function renderOffer(box){
 }
 function renderShop(){
   $('wallet').textContent = '所持 小判 ' + META.koban + '枚';
-  $('tScroll').classList.toggle('on', shopTab === 'scroll'); $('tBase').classList.toggle('on', shopTab === 'base'); $('tAlly').classList.toggle('on', shopTab === 'ally'); $('tOffer').classList.toggle('on', shopTab === 'offer');
+  $('tScroll').classList.toggle('on', shopTab === 'scroll'); $('tBase').classList.toggle('on', shopTab === 'base'); $('tSpecial').classList.toggle('on', shopTab === 'special'); $('tAlly').classList.toggle('on', shopTab === 'ally'); $('tOffer').classList.toggle('on', shopTab === 'offer');
   const box = $('shoplist'), st = box.scrollTop; box.innerHTML = '';
   if (shopTab === 'offer'){ renderOffer(box); box.scrollTop = st; return; }
   if (shopTab === 'ally'){
@@ -3286,6 +3304,7 @@ function renderShop(){
     }
     box.scrollTop = st; return;
   }
+  if (shopTab === 'special'){ const nt = document.createElement('div'); nt.className = 'shint'; nt.textContent = '特殊な効果です。1回買うと、ずっと有効になります。'; box.appendChild(nt); }
   if (shopTab === 'scroll'){ const nt = document.createElement('div'); nt.className = 'shint'; nt.textContent = '買ったぶんのレベルの効果を、いつも得られます。ゲーム中の巻物欄は使いません。拾った巻物とは、重ねて効きます。'; box.appendChild(nt); }
   for (const id in UPS){
     const u = UPS[id]; if (u.grp !== shopTab) continue;
@@ -3334,14 +3353,17 @@ function setPauseInfo(){
   const mapTx = G.mode === 'end' ? '百鬼夜行' : (G.mapIdx >= 0 && MAPS[G.mapIdx] ? '第' + (G.mapIdx + 1) + '地「' + MAPS[G.mapIdx].name + '」' : '退魔モード');
   const el = $('pauseInfo'); el.textContent = mapTx;
   if (G.mode === 'run' && G.diff){ const sp = document.createElement('span'); sp.className = 'pd ' + (G.diffKey || 'normal'); sp.textContent = G.diff.n + ' ' + diffRating(G.diffKey); el.appendChild(sp); }   // 百鬼夜行は、難易度の札を出さない
+  if (bu('mugen')){ const mg = document.createElement('div'); mg.className = 'pcrit'; mg.textContent = '無限の証明 全ダメージ+' + fmtN(mugenBonus() * 100) + '%'; el.appendChild(mg); }
   const cr = document.createElement('div'); cr.className = 'pcrit'; cr.textContent = '会心率 ' + fmtN(critRate() * 100) + '%  会心ダメージ +' + fmtN(critDmg() * 100) + '%'; el.appendChild(cr);
 }
 function togglePause(){
   if (!G || G.over || G.modal) return;
-  G.paused = !G.paused; if (G.paused) setPauseInfo(); $('pause').classList.toggle('hide', !G.paused); bgmSetDuck(G.paused ? .3 : 1);
+  G.paused = !G.paused; if (G.paused) setPauseInfo(); else $('pauseNote').textContent = ''; $('pause').classList.toggle('hide', !G.paused); bgmSetDuck(G.paused ? .3 : 1);
   if (retireTimer){ clearTimeout(retireTimer); retireTimer = 0; $('bQuit').textContent = 'リタイア'; $('bQuit').classList.remove('warn'); }
 }
-document.addEventListener('visibilitychange', () => { if (document.hidden && metaDirty) saveMeta(); if (document.hidden && G && !G.over && !G.modal && !G.paused) togglePause(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && metaDirty) saveMeta(); if (document.hidden && G && !G.over && !G.modal && !G.paused) togglePause(); if (document.hidden) snapshotRun(); });
+window.addEventListener('pagehide', () => { if (metaDirty) saveMeta(); snapshotRun(); });
+window.addEventListener('beforeunload', () => { if (metaDirty) saveMeta(); snapshotRun(); });
 $('bPause').addEventListener('click', togglePause);
 $('bResume').addEventListener('click', togglePause);
 $('bReroll').addEventListener('click', doReroll);
@@ -3366,6 +3388,7 @@ $('tAll').addEventListener('click', () => { for (const t of TITLES) if (!META.ti
 $('tScroll').addEventListener('click', () => { shopTab = 'scroll'; renderShop(); });
 $('tOffer').addEventListener('click', () => { shopTab = 'offer'; renderShop(); });
 $('tBase').addEventListener('click', () => { shopTab = 'base'; renderShop(); });
+$('tSpecial').addEventListener('click', () => { shopTab = 'special'; renderShop(); });
 $('tAlly').addEventListener('click', () => { shopTab = 'ally'; renderShop(); });
 $('sBack').addEventListener('click', () => { $('shop').classList.add('hide'); $('title').classList.remove('hide'); refreshTitle(); });
 $('sCheat').addEventListener('click', () => { META.koban += 1000; saveMeta(); renderShop(); });
@@ -3383,6 +3406,60 @@ $('dHeal').addEventListener('click', () => { if (G) G.p.hp = maxHp(); });
 window.addEventListener('resize', resize);
 
 /* ================= メインループ ================= */
+/* ===== ゲーム中の、途中経過の保存(うっかり、ページを閉じたり、リロードしても、一時停止の画面から、続けられる) =====
+   4秒ごと・画面を離れたとき・閉じるときに、保存する。ゲームが終わったとき(倒れた・クリア・リタイア)は、消す。
+   敵は、ボスと、近くの250体だけ。残魂は、近くの400個だけ(残りは、復帰したあとに、また出てくる) */
+const RUN_KEY = 'ss_run', RUN_VER = 1;
+let lastRunSave = 0;
+const RUN_SKIP_G = new Set(['cfg', 'diff', 'enemies', 'souls', 'items', 'projs', 'zones', 'spins', 'fx', 'texts', 'later', 'p', 'finalBoss', 'subChip', 'subEm', 'subEmTxt', 'cine', 'sparkN', 'moonSp', 'noSpark', 'banked']);
+function packObj(o, skip){
+  const r = {};
+  for (const k in o){ if (skip && skip.has(k)) continue; const v = o[k]; if (typeof v === 'function' || v instanceof Set || v instanceof Map || (typeof Node !== 'undefined' && v instanceof Node)) continue; r[k] = v; }
+  return r;
+}
+function clearRunSave(){ try { localStorage.removeItem(RUN_KEY); } catch (_) {} }
+function snapshotRun(){
+  if (!G || G.over || !G.p || G.cine) return;
+  lastRunSave = Date.now();
+  try {
+    const p = G.p, d2 = e => (e.x - p.x) ** 2 + (e.y - p.y) ** 2;
+    const bosses = G.enemies.filter(e => !e.dead && (e.boss || e.final)), others = G.enemies.filter(e => !e.dead && !(e.boss || e.final)).sort((a, b) => d2(a) - d2(b)).slice(0, 250);
+    const en = bosses.concat(others), fi = G.finalBoss ? en.indexOf(G.finalBoss) : -1;
+    const payload = {
+      v: RUN_VER, ts: Date.now(), mode: G.mode, charId: G.charId, mapIdx: G.mapIdx, diffKey: G.diffKey,
+      g: packObj(G, RUN_SKIP_G), p: packObj(p),
+      enemies: en.map(e => packObj(e)), finalIdx: fi,
+      souls: G.souls.slice().sort((a, b) => d2(a) - d2(b)).slice(0, 400).map(e => packObj(e)),
+      items: G.items.map(e => packObj(e)), zones: G.zones.map(e => packObj(e))
+    };
+    localStorage.setItem(RUN_KEY, JSON.stringify(payload, (k, v) => (typeof v === 'number' && !Number.isInteger(v)) ? Math.round(v * 100) / 100 : v));
+  } catch (_) {}
+}
+function restoreRun(){
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(RUN_KEY) || 'null'); } catch (_) { d = null; }
+  if (!d) return false;
+  if (d.v !== RUN_VER || !d.g || !d.p || !d.mode){ clearRunSave(); return false; }
+  try {
+    newGame(d.mode, d.charId, d.mapIdx);
+    Object.assign(G, d.g);
+    G.diffKey = d.mode === 'end' ? 'none' : (DIFFS[d.diffKey] ? d.diffKey : 'normal'); G.diff = d.mode === 'end' ? ENDLESS_DIFF : DIFFS[G.diffKey];
+    Object.assign(G.p, d.p);
+    G.enemies = d.enemies || []; G.souls = d.souls || []; G.items = d.items || []; G.zones = d.zones || [];
+    G.finalBoss = d.finalIdx >= 0 ? (G.enemies[d.finalIdx] || null) : null;
+    G.projs = []; G.spins = []; G.fx = []; G.texts = []; G.later = []; G.cine = null; G.over = false;
+    curMap = d.mode === 'end' ? 'end' : (d.mapIdx >= 0 ? d.mapIdx : 0); loadGround(curMap); buildTile();
+    ['title', 'maps', 'chars', 'shop', 'titles', 'settings', 'result', 'pause', 'lvup'].forEach(id => $(id).classList.add('hide'));
+    $('hud').classList.remove('hide'); hudCache = {};
+    cam.x = G.p.x; cam.y = G.p.y; stick.on = false; stick.dx = stick.dy = 0;
+    renderSlots();
+    bgmWant(d.mode === 'end' ? 'endless' : (d.mapIdx >= 3 ? 'late' : 'early'), { fadeIn: 2, fadeOut: 1 }); bgmSetDuck(.3);
+    G.paused = true;
+    if (G.modal){ if (G.lvMode === 'art') showArt(true); else openLevelUp(G.lvChoices); }   // レベルアップ・奥義の選択の途中だったら、その画面に戻る
+    else { setPauseInfo(); $('pauseNote').textContent = '前回のゲームを、途中から復帰しました。「再開」で、続きから遊べます(やめるときは、リタイア)。'; $('pause').classList.remove('hide'); }
+    return true;
+  } catch (_) { G = null; clearRunSave(); return false; }
+}
 function frame(ts){
   const dt = Math.min(.05, (ts - lastTs) / 1000 || 0); lastTs = ts;
   if (G && !G.paused && !G.over){ META.stats.play += dt; metaDirty = true;
@@ -3391,12 +3468,14 @@ function frame(ts){
     if (G) updateHud();
   }
   if (metaDirty && Date.now() - lastMetaSave > 5000) saveMeta();
+  if (G && !G.over && Date.now() - lastRunSave > 4000) snapshotRun();   // 途中経過を、4秒ごとに保存
   render();
   requestAnimationFrame(frame);
 }
 for (const k in MAP_BG) loadGround(k);
 refreshTitle();
 resize();
+restoreRun();   // 前回のゲームが、途中のままなら、一時停止の画面で、復帰させる
 requestAnimationFrame(frame);
 
 })();
