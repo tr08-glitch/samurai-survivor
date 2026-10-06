@@ -203,6 +203,23 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 .dchip.lock{ opacity:.42; border-style:dashed; cursor:default; }
 .dchip:disabled{ pointer-events:none; }
 .dchips .dn{ flex:1 0 100%; margin-top:2px; font-size:11px; color:var(--moon-dim); line-height:1.5; }
+#amaAwake{ position:absolute; inset:0; z-index:65; display:flex; align-items:center; justify-content:center; overflow:hidden; background:radial-gradient(ellipse at 50% 46%, rgba(46,30,10,.94) 0%, rgba(22,13,5,.97) 55%, rgba(4,3,8,.99) 100%); animation:aaIn .5s ease-out; touch-action:manipulation; }
+#amaAwake.hide{ display:none; } @keyframes aaIn{ from{ opacity:0; } to{ opacity:1; } }
+#amaAwake .aa-rays{ position:absolute; left:50%; top:46%; width:230vmax; height:230vmax; margin:-115vmax 0 0 -115vmax; background:repeating-conic-gradient(from 0deg, rgba(255,222,120,.11) 0deg 4deg, rgba(255,222,120,0) 4deg 16deg); -webkit-mask-image:radial-gradient(circle, #000 0%, rgba(0,0,0,.7) 12%, transparent 34%); mask-image:radial-gradient(circle, #000 0%, rgba(0,0,0,.7) 12%, transparent 34%); animation:aaSpin 28s linear infinite, aaRayIn 1.4s ease-out; }
+@keyframes aaSpin{ to{ transform:rotate(360deg); } } @keyframes aaRayIn{ from{ opacity:0; transform:scale(.3) rotate(0); } to{ opacity:1; } }
+#amaAwake .aa-glow{ position:absolute; left:50%; top:46%; width:70vmin; height:70vmin; margin:-35vmin 0 0 -35vmin; border-radius:50%; background:radial-gradient(circle, rgba(255,240,190,.75) 0%, rgba(255,205,90,.38) 36%, rgba(255,205,90,0) 70%); animation:aaPulse 2.6s ease-in-out infinite, aaGlowIn 1.1s ease-out; }
+@keyframes aaPulse{ 0%,100%{ transform:scale(1); opacity:.9; } 50%{ transform:scale(1.12); opacity:1; } } @keyframes aaGlowIn{ from{ opacity:0; transform:scale(.2); } to{ opacity:.9; transform:scale(1); } }
+#amaAwake .aa-body{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 16px; }
+#amaAwake .aa-art{ width:min(24vmin,170px); height:min(36vmin,255px); margin-bottom:6px; filter:drop-shadow(0 0 18px rgba(255,226,140,.85)) drop-shadow(0 0 40px rgba(255,200,80,.5)); animation:aaRise 1.5s cubic-bezier(.2,.8,.2,1) .25s both; }
+#amaAwake .aa-art img{ width:100%; height:100%; object-fit:contain; display:block; }
+@keyframes aaRise{ from{ opacity:0; transform:translateY(34px) scale(.82); } to{ opacity:1; transform:none; } }
+#amaAwake .aa-name{ font-family:var(--font-display); font-weight:800; font-size:clamp(26px,7vmin,48px); letter-spacing:.18em; color:#ffe9a8; text-shadow:0 0 14px rgba(255,200,80,.95), 0 0 34px rgba(255,170,40,.6), 0 2px 4px #000; animation:aaText 1.2s ease-out .9s both; }
+#amaAwake .aa-sub{ margin-top:2px; font-family:var(--font-display); font-weight:800; font-size:clamp(16px,4vmin,26px); letter-spacing:.5em; text-indent:.5em; color:#fff6d8; text-shadow:0 0 10px rgba(255,210,120,.9), 0 2px 3px #000; animation:aaText 1.1s ease-out 1.5s both; }
+#amaAwake .aa-note{ margin-top:8px; font-size:clamp(11px,2.8vmin,15px); color:#e9d9b0; text-shadow:0 1px 3px #000; animation:aaText 1s ease-out 2s both; }
+#amaAwake .aa-tap{ margin-top:14px; font-size:11px; letter-spacing:.2em; color:#b8a878; opacity:0; animation:aaTapIn .8s ease-out 2.4s forwards, aaBlink 1.8s ease-in-out 3.2s infinite; }
+@keyframes aaText{ from{ opacity:0; transform:translateY(10px); letter-spacing:.5em; } to{ opacity:1; transform:none; } } @keyframes aaTapIn{ to{ opacity:.8; } } @keyframes aaBlink{ 0%,100%{ opacity:.8; } 50%{ opacity:.3; } }
+#amaAwake canvas{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+@media (orientation:landscape) and (max-height:560px){ #amaAwake .aa-art{ width:min(20vmin,110px); height:min(30vmin,165px); } #amaAwake .aa-name{ font-size:clamp(22px,6vmin,34px); } #amaAwake .aa-note{ margin-top:4px; } #amaAwake .aa-tap{ margin-top:8px; } }
 #qtyDlg{ position:absolute; inset:0; z-index:56; display:flex; align-items:center; justify-content:center; background:rgba(4,6,14,.82); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); padding:12px; animation:zIn .2s ease-out; }
 #qtyDlg.hide{ display:none; }
 #qtyDlg .qd{ width:min(400px,94vw); padding:14px 16px 12px; border:1px solid var(--kin); border-radius:6px; background:linear-gradient(rgba(18,22,44,.97),rgba(10,13,28,.98)); box-shadow:0 0 26px rgba(216,180,90,.22); }
@@ -506,6 +523,9 @@ html.rot #rotateHint{ display:flex; }
     <div class="row3"><button class="btn" id="mBack">戻る</button><button class="btn sm" id="mAll">試遊用:全マップ解放</button></div>
   </section>
 
+  <div id="amaAwake" class="hide" aria-live="polite"><div class="aa-rays"></div><div class="aa-glow"></div>
+    <div class="aa-body"><div class="aa-art"></div><div class="aa-name">天 照 大 御 神</div><div class="aa-sub">目覚めた</div><div class="aa-note">隠しキャラが、出撃できるようになった</div><div class="aa-tap" id="aaTap">タップで閉じる</div></div>
+    <canvas id="aaSpark"></canvas></div>
   <div id="qtyDlg" class="hide"><div class="qd">
     <h3 id="qdTitle"></h3><p class="ds" id="qdSub"></p>
     <div class="qrow"><button id="qdM10">−10</button><button id="qdM1">−1</button><b id="qdN">1</b><button id="qdP1">＋1</button><button id="qdP10">＋10</button></div>
@@ -988,8 +1008,8 @@ const ARTS = {
   gaki:{ n:'有財餓鬼', ab:'餓', desc:'全ての攻撃力と、ノックバックが、10分の1になる。代わりに、小判が落ちるとき、落ちる数が+5になる' },
   guren:{ n:'紅蓮地獄', ab:'紅', desc:'全ての攻撃に、燃焼(継続ダメージ)が付く。火遁を持っていれば、火遁が、上位の妖術「蒼炎」(青い炎。着弾点に炎痕が残る。連射が大幅に速い)に変わる' },
   rinne:{ n:'輪廻転生', ab:'輪', desc:'倒れたとき、1度だけ、今のステータス(レベル・装備)を持ったまま、ステージの最初に戻る(HPは満タン)。ただし、時計は戻らず、そのまま進み続ける。敵の強さとイベントは、最初からやり直しになる(記録に挑戦するときに向く)' },
-  shimen:{ n:'四面楚歌', ab:'四', desc:'ふつうの敵とは別に、新しい敵が、常に、マップの全方向から、押し寄せ続けるようになる(敵の量が、増える。イベントとは、別)。代わりに、残魂を拾える範囲+20%、全ての武器・妖術のクールタイム-10%' },
-  meikyo:{ n:'明鏡止水', ab:'鏡', desc:'動いている間は、攻撃できなくなる。止まっている間だけ攻撃し、そのとき、残魂を拾える範囲+25%、全ての武器・妖術の、ノックバック+30%・攻撃回数+2' },
+  shimen:{ n:'四面楚歌', ab:'四', desc:'その地の、ふつうの敵の出現量が、2倍になる(イベントの敵は、そのまま)。代わりに、残魂を拾える範囲+20%、全ての武器・妖術のクールタイム-10%' },
+  meikyo:{ n:'明鏡止水', ab:'鏡', desc:'1秒以上、立ち止まっている間だけ、攻撃できる(動いている間と、立ち止まって1秒までは、攻撃できない)。そのとき、残魂を拾える範囲+25%、全ての武器・妖術の、ノックバック+30%・攻撃回数+2' },
   ichi:{ n:'一刀両断', ab:'断', desc:'武器を、1つしか持てなくなる(持っている武器から、1つ選ぶ)。代わりに、捨てた武器の強化(ダメージ・基礎ダメージ・攻撃回数・範囲・クールタイム)を、全て引き継ぐ。クールタイムは掛け算(例: -20%を2つで、×0.8×0.8)' }
 };
 const CATS = {
@@ -1083,18 +1103,20 @@ const gWDmg = () => gDmg() * G.p.ch.wd * lowMul() * (hasArt('chikurui') ? 1.2 : 
 const gSDmg = () => gDmg() * G.p.ch.sd * lowMul() * (1 + tb('sdmg')) * (hasArt('onmyo') ? 1.5 : 1);   // 陰陽真王: 妖術の火力+50%
 const gSCd = () => gCd() * G.p.ch.scd;
 const artWcd = () => hasArt('chikurui') ? .65 : 1;
+const spellSlots = () => 3 + (bu('majin') ? 1 : 0);   // 妖術の枠: ふつうは3つ。魔人があると、4つ
 const weaponSlots = () => hasArt('ichi') ? 1 : 5 + (hasArt('chikurui') ? 3 : 0);   // 一刀両断: 武器は、1つだけ
 const ARMOR_SLOTS = 5;
 const extraChoices = () => { const l = sl('uranai'); return l >= 4 ? 2 : (l >= 1 ? 1 : 0); };
 const dropMul = () => 1 + .2 * sl('uranai');
 const senjuFactor = () => .8;   // 千手の追加分の威力
-const pickupR = () => CFG.pickupBase * (1 + .2 * (G.p.armor.juzu || 0)) * (1 + .08 * bu('pickup')) * (1 + tb('pick')) * G.p.ch.pick * (hasArt('shimen') ? 1.2 : 1) * (hasArt('meikyo') && !G.p.moving ? 1.25 : 1);   // 四面楚歌+20%、明鏡止水(止まっているとき)+25%
+const pickupR = () => CFG.pickupBase * (1 + .2 * (G.p.armor.juzu || 0)) * (1 + .08 * bu('pickup')) * (1 + tb('pick')) * G.p.ch.pick * (hasArt('shimen') ? 1.2 : 1) * (hasArt('meikyo') && meikyoStill() ? 1.25 : 1);   // 四面楚歌+20%、明鏡止水(1秒以上、止まっているとき)+25%
 const gCd = () => Math.max(.4, 1 - .05 * sl('jinsoku') - tb('cd') - (hasArt('shimen') ? .1 : 0));   // 四面楚歌: 全ての武器・妖術のCT-10%
 const gArea = () => (1 + .06 * sl('koiki')) * G.p.ch.area;
 const gDur = () => 1 + .08 * sl('jizoku');
 const gSoul = () => (1 + .08 * sl('heiho')) * (1 + .03 * bu('soulgain')) * (1 + tb('soul')) * G.p.ch.soul * (hasArt('tamakui') ? 1.2 : 1) * (G.moonT > G.t ? 1.5 : 1);
 const dmgScale = () => 1 + CFG.contactDmgPer5min * Math.floor(vsec() / 300);
-const END_ACCEL = 3000;   // 百鬼夜行: 時間がたつほど、敵が強くなる速さが上がる(前は3600。小さいほど、速く強くなる)
+const END_ACCEL = 900;   // 百鬼夜行: 時間がたつほど、敵が強くなる速さが上がる(前は3000。小さいほど、速く強くなる。30〜45分で、約2倍の速さ)
+const END_ACCEL_KB = 3000;   // ノックバックの減り方に使う、時間の進み方の係数(敵の強さとは、別。前に承認された、減り方を保つ)
 const END_HP_UP = 1.11, END_SPAWN_UP = 1.08;   // 百鬼夜行だけ: 敵の体力の伸び×1.11(0.28→約0.31)、出現数×1.08(退魔モードは、変えない)
 /* 百鬼夜行のスコア: 生存時間・撃破数・被弾数の3つで採点する。合計は、0点未満にならない */
 const SCORE_PER_SEC = 20, SCORE_PER_KILL = 1, SCORE_PER_HIT = -150;   // 生き延びた1秒=20点 / 倒した1体=1点 / 被弾1回=-150点
@@ -1107,7 +1129,9 @@ const bossMul = () => G.mode === 'end' ? 1 + .5 * Math.floor(vsec() / 1200) : 1;
 const hw = () => W / 2 / U, hh = () => H / 2 / U;
 const onScreen = e => G.dex || (Math.abs(e.x - G.p.x) <= hw() + e.r && Math.abs(e.y - G.p.y) <= hh() + e.r);   // 画面の中にいる敵だけ、攻撃が当たる(体が、少しでも、画面に触れていれば、当たる)
 const ringR = () => Math.hypot(hw(), hh()) + 1.3;
-const meikyoExtra = () => (hasArt('meikyo') && !G.p.moving) ? 2 : 0;   // 明鏡止水(止まっているとき): 攻撃回数+2
+const MEIKYO_STILL_SEC = 1;   // 明鏡止水: 「止まっている」とみなすまでの、立ち止まる時間(秒)
+const meikyoStill = () => (G.p.stillT || 0) >= MEIKYO_STILL_SEC;   // 1秒以上、立ち止まっているか
+const meikyoExtra = () => (hasArt('meikyo') && meikyoStill()) ? 2 : 0;   // 明鏡止水(1秒以上、止まっているとき): 攻撃回数+2
 const extraTimes = () => sl('senju') + meikyoExtra() + Math.round(tb('atkn'));   // 称号「天上天下唯我独尊」: 全ての攻撃回数+1
 const weaponExtra = () => sl('senju') + G.p.ch.extra + meikyoExtra() + Math.round(tb('atkn'));
 
@@ -1381,14 +1405,14 @@ function addXp(v){
 const KB_REF = 12, KB_FRICTION = 9, KB_MAX_SPEED = 16, KB_SPEED_K = 30 * (1 - Math.exp(-KB_FRICTION / 30));   // 1コマ(1/30秒)ずつ減らしていくので、合計の飛ぶ距離が、ちょうど kb になる係数
 function kbResist(e){ return clamp(Math.sqrt(KB_REF / Math.max(KB_REF, e.mhp || KB_REF)), e.boss ? .03 : .06, 1); }
 function kbTimeMul(){
-  if (G.mode === 'end') return 1 / (1 + vsec() / KB_END_DIV);   // 百鬼夜行: 割り算の形で減る(時間が進むほど、ゆっくり小さくなる。0には、ならない)
+  if (G.mode === 'end'){ const t = stageT(), kv = t * (1 + t / END_ACCEL_KB); return 1 / (1 + kv / KB_END_DIV); }   // 百鬼夜行: 割り算の形で減る(時間が進むほど、ゆっくり小さくなる。0には、ならない)。敵の強さの加速とは、別の時間の進み方で、計算する
   return Math.max(KB_TIME_MIN, 1 - vsec() * KB_TIME_RATE);   // 退魔モード: これまでどおり(下限あり)
 }   // 時間とともに、敵が受けるノックバックを、少しずつ減らす
 const KB_END_DIV = 3000;   // 百鬼夜行のノックバック倍率 = 1 ÷ (1 + 仮想の経過秒 ÷ 3000)(前は5000。小さいほど、早く減る)
 const KB_TIME_RATE = .00012, KB_TIME_MIN = .55;   // 10分で約-7%、20分で約-14%。百鬼夜行は、仮想の時間が速く進むので、より早く減る(下限は、約-45%)
 function kbPush(e, kb, dx, dy){
   if (!kb || e.dead || e.flee || !onScreen(e)) return;   // 画面の外の敵は、飛ばさない
-  const d = Math.hypot(dx, dy) || 1, v = kb * kbResist(e) * KB_SPEED_K * kbTimeMul() * (hasArt('gaki') ? GAKI_MUL : 1) * (hasArt('meikyo') && !G.p.moving ? 1.3 : 1);   // 明鏡止水(止まっているとき): ノックバック+30%   // 飛ぶ距離の合計が、kb × 飛ばされにくさ になる
+  const d = Math.hypot(dx, dy) || 1, v = kb * kbResist(e) * KB_SPEED_K * kbTimeMul() * (hasArt('gaki') ? GAKI_MUL : 1) * (hasArt('meikyo') && meikyoStill() ? 1.3 : 1);   // 明鏡止水(1秒以上、止まっているとき): ノックバック+30%   // 飛ぶ距離の合計が、kb × 飛ばされにくさ になる
   e.kx = (e.kx || 0) + dx / d * v; e.ky = (e.ky || 0) + dy / d * v;
   const sp = Math.hypot(e.kx, e.ky); if (sp > KB_MAX_SPEED){ e.kx *= KB_MAX_SPEED / sp; e.ky *= KB_MAX_SPEED / sp; }
 }
@@ -1470,16 +1494,8 @@ function updateSpawns(dt){
   if (stageT() < G.noSpawn || G.enemies.length >= capN()) return;
   const m = vsec() / 60, mEff = G.mode === 'run' && m > 20 ? 20 + (m - 20) * .5 : m;   // 退魔モードは、仮想の20分以降の増え方をゆるやかに
   const fb = G.finalBoss, bossFight = fb && !fb.dead && fb.hp > 0 && G.mode === 'run';   // 主との戦いの間は、ふつうの敵の出現を減らして、主に集中して戦えるようにする
-  const baseRate = (1.65 + .75 * mEff) * dens() * (bossFight ? BOSS_FIGHT_SPAWN : 1) * (G.mode === 'end' ? END_SPAWN_UP : 1);
+  const baseRate = (1.65 + .75 * mEff) * dens() * (bossFight ? BOSS_FIGHT_SPAWN : 1) * (G.mode === 'end' ? END_SPAWN_UP : 1) * (hasArt('shimen') ? SHIMEN_MUL : 1);   // 四面楚歌: その地の、敵の出現量が、2倍になる
   G.spAcc += baseRate * dt;
-  if (hasArt('shimen')){   // 四面楚歌: 通常の敵とは別枠で、新しい敵が、マップの全方向から、押し寄せ続ける(敵の量が増える)
-    G.shAcc = (G.shAcc || 0) + baseRate * SHIMEN_EXTRA * dt;
-    while (G.shAcc >= 1){
-      G.shAcc--; if (G.enemies.length >= capN()) break;
-      G.shAng = ((G.shAng || 0) + 2.399963) % TAU;   // 黄金角(約137.5度)ずつ、ずらす: 全方向に、かたよりなく、順に、現れる
-      const q2 = ringPos(rnd(0, SPAWN_JITTER), G.shAng); spawnEnemy(pickType(m), q2.x, q2.y);
-    }
-  }
   while (G.spAcc >= 1){
     G.spAcc--;
     if (G.enemies.length >= capN()) break;
@@ -1489,7 +1505,7 @@ function updateSpawns(dt){
 }
 
 /* ================= イベント(1分ごと) ================= */
-const SHIMEN_EXTRA = .6;   // 四面楚歌: 通常の出現量に対する、追加の敵の量の割合(+60%)
+const SHIMEN_MUL = 2;   // 四面楚歌: ふつうの敵の、出現量の倍率(2倍)
 const SHIPPU_WAVES = 3, SHIPPU_GAP = 2.5;   // 疾風の群れ: 繰り返す回数と、間隔(秒)
 const EV = {
   sho:{ n:'小さな百鬼の行列', f(){ band(Math.random() * TAU, 16, G.cfg.band.slice(0, 2)); } },
@@ -1942,7 +1958,7 @@ function updatePlayer(dt){
   if (stick.on){ ix = stick.dx; iy = stick.dy; }
   const m = Math.hypot(ix, iy);
   if (m > 1){ ix /= m; iy /= m; }
-  p.moving = m > .15;
+  p.moving = m > .15; p.stillT = p.moving ? 0 : (p.stillT || 0) + dt;   // 止まってからの秒数(明鏡止水の、停止の判定に使う)
   if (m > .15){ p.face = unit(ix, iy); if (Math.abs(p.face.x) > .25) p.faceX = p.face.x > 0 ? 1 : -1; }
   const sp = CFG.playerSpeed * (1 + .06 * (p.armor.zori || 0)) * p.ch.spd * (1 + .02 * bu('speed')) * (1 + tb('spd'));
   p.x += ix * sp * dt; p.y += iy * sp * dt;
@@ -2137,7 +2153,7 @@ function updateEnemies(dt){
   }
 }
 function updateWeapons(dt){
-  const still = !(hasArt('meikyo') && G.p.moving);   // 明鏡止水: 動いている間は、攻撃できない(CTは、進むので、止まった瞬間に撃てる)
+  const still = !hasArt('meikyo') || meikyoStill();   // 明鏡止水: 1秒以上、立ち止まるまでは、攻撃できない(CTは、進むので、止まって1秒たった瞬間に撃てる)
   for (const w of G.p.weapons){
     w.t -= dt;
     if (w.t <= 0){ if (!still){ w.t = 0; continue; } w.t = fireWeapon(w); }
@@ -2151,7 +2167,7 @@ function updateSpells(dt){
       continue;
     }
     sp.t -= dt;
-    if (sp.t <= 0){ if (hasArt('meikyo') && p.moving){ sp.t = 0; continue; } const cd = fireSpell(sp); sp.t = cd > 0 ? cd : 0; }   // 明鏡止水: 動いている間は、妖術も撃てない
+    if (sp.t <= 0){ if (hasArt('meikyo') && !meikyoStill()){ sp.t = 0; continue; } const cd = fireSpell(sp); sp.t = cd > 0 ? cd : 0; }   // 明鏡止水: 動いている間は、妖術も撃てない
   }
   if (p.windT > 0){
     p.windT -= dt; p.windAng += 4 * dt;
@@ -2379,7 +2395,7 @@ function buildChoices(){
   for (const w of p.weapons) if (w.lv < maxLvOf(WEAPONS[w.id])) groups.w.push({ k:'w', id: w.id });
   if (p.weapons.length < weaponSlots()) for (const id in WEAPONS) if (!p.weapons.some(w => w.id === id) && (!WEAPONS[id].only || WEAPONS[id].only === G.charId) && !isLocked('w', id)) groups.w.push({ k:'w', id });
   for (const s of p.spells) if (s.lv < maxLvOf(SPELLS[s.id])) groups.s.push({ k:'s', id: s.id });   // 妖術も、武器と同じ、Lv8まで(超越の書で、+4)
-  if (p.spells.length < 3) for (const id in SPELLS) if (!p.spells.some(s => s.id === id || (id === 'katon' && hasArt('guren') && s.id === 'guren')) && !SPELLS[id].hidden && !SPELLS[id].only && !isLocked('s', id)) groups.s.push({ k:'s', id });
+  if (p.spells.length < spellSlots()) for (const id in SPELLS) if (!p.spells.some(s => s.id === id || (id === 'katon' && hasArt('guren') && s.id === 'guren')) && !SPELLS[id].hidden && !SPELLS[id].only && !isLocked('s', id)) groups.s.push({ k:'s', id });
   if (hasArt('chikurui')) groups.s.length = 0;   // 血狂い: 妖術は使えない
   if (hasArt('akuma')) groups.w.length = 0;      // 悪魔付き: 武器は使えない(レベルアップにも出ない)
   for (const id in ARMOR){ if (ARMOR[id].only) continue; const l = p.armor[id] || 0; if (l < armorMax() && (l > 0 || (Object.keys(p.armor).length < ARMOR_SLOTS && !isLocked('a', id)))) groups.a.push({ k:'a', id }); }
@@ -2462,7 +2478,10 @@ function ichiInherit(keepId, weapons){
     for (let i = 0; i < w.lv - 1; i++){
       const e = lvEntry(D, i)[1];
       if (e.d) sum.d += e.d;                                   // 攻撃力上昇(%): 足し算
-      if (e.n) T.cnt += e.n;                                   // 攻撃回数
+      if (e.n) T.cnt += e.n;                                   // 攻撃回数: 同時に飛ぶ・投げる数
+      if (e.m) T.cnt += e.m;                                   // 攻撃回数: 撒菱の設置数
+      if (e.pn) T.cnt += e.pn;                                 // 攻撃回数: 天叢雲剣の剣圧の本数
+      for (const kx of ['twin', 'echo', 'double', 'side', 'fan']) if (e[kx]) T.cnt += 1;   // 攻撃回数: 二連発・二連斬り・2連撃・戻りの攻撃・左右の突き・扇状の矢(各+1)
       if (e.a) sum.a += e.a;                                   // 範囲上昇(%): 足し算
       if (e.x && w.id === 'naginata') sum.a += e.x;             // 薙刀の「外側の範囲」は、範囲として、引き継ぐ
       else if (e.x) sum.x += e.x;                              // 射程(槍・吹き矢・苦無の「射程+%」): 足し算。残す武器が、射程を持つときだけ、使う(下)
@@ -2528,7 +2547,7 @@ function inheritPool(){
   const g = META.lastGear, p = G.p, out = []; if (!g) return out;
   const mine = D => !D.only && !D.hidden && !D.special;   // 専用の装備(天叢雲剣・八咫鏡・月光・苦無など)と、特殊な妖術(深淵侵食など)は、継承できない
   for (const w of (g.weapons || [])){ const D = WEAPONS[w.id]; if (!D || !mine(D)) continue; const ex = p.weapons.find(x => x.id === w.id); if (ex ? ex.lv < w.lv : p.weapons.length < weaponSlots()) out.push({ k:'w', id:w.id, lv:Math.min(w.lv, maxLvOf(D)) }); }
-  for (const sp of (g.spells || [])){ const D = SPELLS[sp.id]; if (!D || !mine(D)) continue; const ex = p.spells.find(x => x.id === sp.id); if (ex ? ex.lv < sp.lv : p.spells.length < 3) out.push({ k:'s', id:sp.id, lv:Math.min(sp.lv, maxLvOf(D)) }); }
+  for (const sp of (g.spells || [])){ const D = SPELLS[sp.id]; if (!D || !mine(D)) continue; const ex = p.spells.find(x => x.id === sp.id); if (ex ? ex.lv < sp.lv : p.spells.length < spellSlots()) out.push({ k:'s', id:sp.id, lv:Math.min(sp.lv, maxLvOf(D)) }); }
   const used = Object.keys(p.armor).filter(id => id !== 'yasakani').length;
   for (const id in (g.armor || {})){ const D = ARMOR[id]; if (!D || !mine(D)) continue; const lv = Math.min(g.armor[id], armorMax()), ex = p.armor[id] || 0; if (ex ? ex < lv : used < ARMOR_SLOTS) out.push({ k:'a', id, lv }); }
   return out;
@@ -4203,7 +4222,7 @@ const UPS = {
   shukoroku:{ grp:'special', n:'集古録珍', mark:'珍', max:1, cost:[30000], eff:n => n ? '通貨「勾玉」を解禁した。ゲーム中に、勾玉(アイテム)を拾うたびに、通貨の勾玉を1獲得する(いま ' + (META.antique ? META.antique.mag : 0) + '個)。強化に、骨董品屋が現れた' : '効果なし' },
   /* 隠し: 同じ分類の強化を、全部、最大にすると、現れる */
   choetsu:{ grp:'scroll', hidden:1, n:'超越の書', mark:'越', max:1, cost:[15000], rare:1, eff:n => n ? '常時: 武器・妖術の最大レベル+4(Lv12まで)' : '効果なし' },
-  majin:{ grp:'base', hidden:1, n:'魔人', mark:'魔', max:1, cost:[15000], rare:1, eff:n => n ? '常時: 防具の最大レベル+2。倒れたとき、1度だけHP半分で蘇る(無敵' + MAJIN_INV + '秒)' : '効果なし' }
+  majin:{ grp:'base', hidden:1, n:'魔人', mark:'魔', max:1, cost:[15000], rare:1, eff:n => n ? '常時: 防具の最大レベル+2、持てる妖術が4つに。倒れたとき、1度だけHP半分で蘇る(無敵' + MAJIN_INV + '秒)' : '効果なし' }
 };
 const hiddenOpen = grp => Object.keys(UPS).filter(id => UPS[id].grp === grp && !UPS[id].hidden).every(id => bu(id) >= UPS[id].max);
 const offerOpen = () => allUnlocked || (META.offer && META.offer.n > 0) || MAPS.every((m, i) => !m.ready || tierCleared('hard', i));   // 賽銭は、全てのマップを、ハード以上でクリアすると解禁
@@ -4216,7 +4235,7 @@ function openShop(tab){
 const KOBAN_PER_MAG = 10;   // 小判換金: 勾玉1個 = 小判10枚(ANTIQUES より前に、定義する)
 const ANTIQUES = {
   koban:  { n:'小判換金', mark:'換', price:1, max:Infinity, desc:'勾玉1個を、小判' + KOBAN_PER_MAG + '枚に換える(個数を選ぶ)', eff:() => '換金の割合: 勾玉1個 = 小判' + KOBAN_PER_MAG + '枚' },
-  unchiku:{ n:'運籌帷幄', mark:'籌', price:100, max:Infinity, desc:'百鬼夜行で得られるスコアが、ずっと、+5%になる(買うたびに、重なる)', eff:() => '今の効果: スコア +' + (ab('unchiku') * 5) + '%(購入 ' + ab('unchiku') + '回)' },
+  unchiku:{ n:'運籌帷幄', mark:'籌', price:100, max:Infinity, desc:'百鬼夜行で得られるスコアが、ずっと、+5%になる(買うたびに、重なる。ボタンを押すと、まとめて買える)', eff:() => '今の効果: スコア +' + (ab('unchiku') * 5) + '%(購入 ' + ab('unchiku') + '回)' },
   jikuu:  { n:'時空超越', mark:'超', price:300, prices:[300, 400, 500, 600, 700, 800, 900], max:7, desc:'ゲームに、倍速の機能が付く。買うたびに、使える倍速が増える(×2〜×8)', eff:() => ab('jikuu') ? '今の効果: 最大 ×' + (1 + ab('jikuu')) + '倍速まで(購入 ' + ab('jikuu') + '/7回)。ゲーム中の右上のボタンを押すと、倍率を、自分で選べる。選んだ倍率は、次のゲームでも使う' : '効果なし(買うと、ゲーム中に、倍速のボタンが現れ、倍率を、自分で選べる)' },
   jigoku: { n:'地獄の門', mark:'獄', price:666, max:1, desc:'難易度「アブソリュート」を、解禁する(ルナティックの7倍の難しさ。使った小判の累計が、増えるほど、さらに難しくなる)', eff:() => ab('jigoku') ? '解禁した。退魔モードで、地を選んだあと、「アブソリュート」を、選べる' : '効果なし' },
   tentou: { n:'天上天下唯我独尊', mark:'尊', price:25000, max:1, desc:'称号「天上天下唯我独尊」を、獲得する(このゲームを、極めしもの)。全ての攻撃回数+1', eff:() => ab('tentou') ? '獲得した。全ての攻撃回数+1(称号の効果は、次のゲームから)' : '効果なし' }
@@ -4232,15 +4251,27 @@ function antiqueBuy(id){
   if (id === 'tentou'){ const t = TITLES.find(x => x.id === 'tentou'); if (t && !META.titles[t.id]){ META.titles[t.id] = 1; recomputeTB(); titleNotice(t); } }   // 称号を獲得
   saveMeta(); renderShop();
 }
-let qtyMax = 1;
-function openQty(){
-  const have = META.antique.mag; if (have < 1) return;
-  qtyMax = have; const r = $('qdRange'); r.max = String(qtyMax); r.value = '1'; $('qdTitle').textContent = '小判換金'; $('qdSub').textContent = '所持 勾玉 ' + have + '個(1個 = 小判' + KOBAN_PER_MAG + '枚)';
-  setQty(1); $('qtyDlg').classList.remove('hide');
+let qtyMax = 1, qtyMode = 'koban';   // 個数選択の画面の、モード: 'koban'(小判換金) / 'unchiku'(運籌帷幄のまとめ買い)
+function openQty(mode){
+  qtyMode = mode === 'unchiku' ? 'unchiku' : 'koban'; const have = META.antique.mag;
+  if (qtyMode === 'unchiku'){
+    const price = antiquePrice('unchiku'); qtyMax = Math.floor(have / price); if (qtyMax < 1) return;
+    $('qdTitle').textContent = '運籌帷幄(まとめ買い)'; $('qdSub').textContent = '所持 勾玉 ' + have + '個(1回 = 勾玉' + price + '個。いま ' + ab('unchiku') + '回購入ずみ)'; $('qdGo').textContent = '購入する';
+  } else {
+    if (have < 1) return; qtyMax = have;
+    $('qdTitle').textContent = '小判換金'; $('qdSub').textContent = '所持 勾玉 ' + have + '個(1個 = 小判' + KOBAN_PER_MAG + '枚)'; $('qdGo').textContent = '換金する';
+  }
+  const r = $('qdRange'); r.max = String(qtyMax); r.value = '1'; setQty(1); $('qtyDlg').classList.remove('hide');
 }
-function setQty(n){ n = Math.max(1, Math.min(qtyMax, Math.round(n))); $('qdN').textContent = n; $('qdRange').value = String(n); $('qdRes').textContent = '勾玉 ' + n + '個 → 小判 ' + (n * KOBAN_PER_MAG) + '枚'; $('qdGo').dataset.n = n; }
+function setQty(n){ n = Math.max(1, Math.min(qtyMax, Math.round(n))); $('qdN').textContent = n; $('qdRange').value = String(n);
+  $('qdRes').textContent = qtyMode === 'unchiku' ? n + '回購入 → 勾玉 ' + (n * antiquePrice('unchiku')) + '個、スコア +' + (n * 5) + '%' : '勾玉 ' + n + '個 → 小判 ' + (n * KOBAN_PER_MAG) + '枚'; $('qdGo').dataset.n = n; }
 function qtyGo(){
-  const n = Math.max(1, Math.min(META.antique.mag, parseInt($('qdGo').dataset.n || '1', 10))); if (META.antique.mag < n) return;
+  const want = parseInt($('qdGo').dataset.n || '1', 10);
+  if (qtyMode === 'unchiku'){   // 運籌帷幄: まとめて、n回買う(1回ごとの価格は、同じ。足りなければ、買えるだけ)
+    const price = antiquePrice('unchiku'), n = Math.max(1, Math.min(Math.floor(META.antique.mag / price), want)); if (META.antique.mag < price) return;
+    META.antique.mag -= price * n; META.antique.buys.unchiku = ab('unchiku') + n; saveMeta(); $('qtyDlg').classList.add('hide'); renderShop(); toast('運籌帷幄を ' + n + '回購入(スコア +' + (n * 5) + '%。合計 +' + (ab('unchiku') * 5) + '%)'); return;
+  }
+  const n = Math.max(1, Math.min(META.antique.mag, want)); if (META.antique.mag < n) return;
   META.antique.mag -= n; META.koban += n * KOBAN_PER_MAG; saveMeta(); $('qtyDlg').classList.add('hide'); renderShop(); toast('勾玉 ' + n + '個を、小判 ' + (n * KOBAN_PER_MAG) + '枚に、換えた');
 }
 function renderAntique(box){
@@ -4252,7 +4283,8 @@ function renderAntique(box){
     if (A.max !== Infinity && A.max > 1){ const sm = document.createElement('small'); sm.textContent = ' ' + n + '/' + A.max; nm.appendChild(sm); }
     d.querySelector('.tx').innerHTML = '<span></span>'; d.querySelector('.tx span').textContent = A.desc; const e2 = document.createElement('div'); e2.className = 'eff'; e2.textContent = A.eff(); d.querySelector('.tx').appendChild(e2);
     const b = document.createElement('button');
-    if (id === 'koban'){ b.className = 'buy' + (META.antique.mag < 1 ? ' no' : ''); b.innerHTML = '換金<br>勾玉1〜'; b.addEventListener('click', openQty); }
+    if (id === 'koban'){ b.className = 'buy' + (META.antique.mag < 1 ? ' no' : ''); b.innerHTML = '換金<br>勾玉1〜'; b.addEventListener('click', () => openQty('koban')); }
+    else if (id === 'unchiku'){ const pr = antiquePrice(id, n); b.className = 'buy' + (META.antique.mag < pr ? ' no' : ''); b.innerHTML = '買う<br>勾玉' + pr.toLocaleString('ja-JP') + '〜'; b.addEventListener('click', () => openQty('unchiku')); }   // 運籌帷幄: 押すと、個数を選べる(まとめ買い)
     else { const pr = antiquePrice(id, n); b.className = 'buy' + (maxed ? ' max' : (META.antique.mag < pr ? ' no' : '')); b.innerHTML = maxed ? '購入済み' : '買う<br>勾玉' + pr.toLocaleString('ja-JP'); if (!maxed) b.addEventListener('click', () => antiqueBuy(id)); }
     d.appendChild(b); box.appendChild(d);
   }
@@ -4350,7 +4382,33 @@ let offerMsg = '';
 const OFFER_KINDS = [{ key:'hp', n:'基礎HP', add:'+1', fmt:v => '+' + v }, { key:'atk', n:'基礎攻撃力', add:'+0.2', fmt:v => '+' + (v * .2).toFixed(1) }, { key:'def', n:'基礎防御力', add:'+0.2', fmt:v => '+' + (v * .2).toFixed(1) }, { key:'crit', n:'会心ダメージ', add:'+0.2%', fmt:v => '+' + ((v || 0) * .2).toFixed(1) + '%' }];
 const AMATERASU_RATE = .002;   // 賽銭を投げるたびに、0.2%で、隠しキャラ「天照大御神」
 let offerHoldOn = false, offerHoldT = null, offerHoldFired = false, offerHoldN = 0, offerSfxAt = 0;
+/* ===== 天照大御神が、目覚めたときの演出(長押しの賽銭では、小さな文字では、見逃すので、画面いっぱいに出す) ===== */
+let amaOpenAt = 0, amaRaf = 0;
+function showAmaterasuAwake(){
+  const box = $('amaAwake'); stopOfferHold();
+  const art = box.querySelector('.aa-art'); art.innerHTML = '';
+  if (CHAR_IMG.amaterasu){ const im = document.createElement('img'); im.src = CHAR_IMG.amaterasu; im.alt = ''; im.draggable = false; art.appendChild(im); } else { art.textContent = '照'; art.style.cssText += ';font-size:64px;color:#ffe9a8;display:flex;align-items:center;justify-content:center'; }
+  box.classList.remove('hide'); amaOpenAt = performance.now();
+  sfxPlay('suzu', SND_VOL.suzu, 1, 0); sfxBell(); setTimeout(() => { if (!box.classList.contains('hide')) sfxBell(); }, 650);   // 鈴と、ベルを重ねる
+  amaSparkStart();
+}
+function closeAmaterasuAwake(){
+  if (performance.now() - amaOpenAt < 800) return;   // 押しっぱなしで、すぐ閉じてしまわない(0.8秒は、閉じられない)
+  $('amaAwake').classList.add('hide'); amaSparkStop(); renderShop();
+}
+function amaSparkStart(){
+  const c = $('aaSpark'), x = c.getContext('2d'), W = c.width = c.clientWidth || innerWidth, H = c.height = c.clientHeight || innerHeight; if (amaRaf) cancelAnimationFrame(amaRaf);
+  const ps = Array.from({ length: 70 }, () => ({ x: Math.random() * W, y: H * (.6 + Math.random() * .5), v: 18 + Math.random() * 48, r: .8 + Math.random() * 2.2, t: Math.random() * 6.28, a: .35 + Math.random() * .55 }));
+  let last = performance.now();
+  const step = now => { const dt = Math.min(.05, (now - last) / 1000); last = now; x.clearRect(0, 0, W, H);
+    for (const q of ps){ q.y -= q.v * dt; q.t += dt * 2; q.x += Math.sin(q.t) * 10 * dt; if (q.y < -6){ q.y = H + 6; q.x = Math.random() * W; }
+      const g = x.createRadialGradient(q.x, q.y, 0, q.x, q.y, q.r * 4); g.addColorStop(0, 'rgba(255,238,170,' + q.a + ')'); g.addColorStop(1, 'rgba(255,200,80,0)'); x.fillStyle = g; x.beginPath(); x.arc(q.x, q.y, q.r * 4, 0, 6.2832); x.fill(); }
+    if (!$('amaAwake').classList.contains('hide')) amaRaf = requestAnimationFrame(step); else amaRaf = 0; };
+  amaRaf = requestAnimationFrame(step);
+}
+function amaSparkStop(){ if (amaRaf){ cancelAnimationFrame(amaRaf); amaRaf = 0; } }
 function throwOffering(fast){
+  if (!$('amaAwake').classList.contains('hide')) return false;   // 天照大御神の演出が、出ている間は、投げられない
   if (META.koban < OFFER_COST){ offerMsg = '小判が足りません(' + OFFER_COST + '枚が必要)'; stopOfferHold(); renderShop(); return false; }
   META.koban -= OFFER_COST; META.stats.spent = (META.stats.spent || 0) + OFFER_COST; const k = OFFER_KINDS[Math.floor(Math.random() * OFFER_KINDS.length)];
   META.offer[k.key] = (META.offer[k.key] || 0) + 1; META.offer.n++;
@@ -4360,7 +4418,7 @@ function throwOffering(fast){
   const now = performance.now();
   if (!fast || now - offerSfxAt > 700){ sfxPlay('suzu', SND_VOL.suzu * (fast ? .38 : 1), 1, 0); offerSfxAt = now; }   // 鈴の音(長押しのときは、鳴らしすぎない)
   offerBurst(k.key, fast ? 26 : 90);   // 火の玉
-  if (jack){ stopOfferHold(); for (const key of ['hp', 'atk', 'def', 'crit']) offerBurst(key); toast('天照大御神が、降臨した…'); }   // 当たりのときは、全部の色の火の玉
+  if (jack){ stopOfferHold(); for (const key of ['hp', 'atk', 'def', 'crit']) offerBurst(key); showAmaterasuAwake(); }   // 当たりのときは、全部の色の火の玉と、画面いっぱいの演出
   return true;
 }
 /* 長押し: 賽銭のボタンを押し続けると、小判がある限り、続けて投げる(だんだん速くなる) */
@@ -4725,6 +4783,7 @@ $('tSpecial').addEventListener('click', () => { shopTab = 'special'; renderShop(
 $('tAlly').addEventListener('click', () => { shopTab = 'ally'; renderShop(); });
 $('tAntique').addEventListener('click', () => { if (!antiqueOpen()) return; shopTab = 'antique'; renderShop(); });
 $('qdM10').addEventListener('click', () => setQty(+$('qdN').textContent - 10)); $('qdM1').addEventListener('click', () => setQty(+$('qdN').textContent - 1)); $('qdP1').addEventListener('click', () => setQty(+$('qdN').textContent + 1)); $('qdP10').addEventListener('click', () => setQty(+$('qdN').textContent + 10));
+$('amaAwake').addEventListener('click', closeAmaterasuAwake); $('amaAwake').addEventListener('pointerup', e => { e.stopPropagation(); });
 $('qdRange').addEventListener('input', () => setQty(+$('qdRange').value)); $('qdMax').addEventListener('click', () => setQty(qtyMax)); $('qdGo').addEventListener('click', qtyGo); $('qdCancel').addEventListener('click', () => $('qtyDlg').classList.add('hide'));
 $('sBack').addEventListener('click', () => { $('shop').classList.add('hide'); $('title').classList.remove('hide'); refreshTitle(); });
 $('sCheat').addEventListener('click', () => { META.koban += 1000000; saveMeta(); renderShop(); });
