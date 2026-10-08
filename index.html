@@ -1196,7 +1196,7 @@ const SCORE_PER_SEC = 20, SCORE_PER_KILL = 1, SCORE_HIT_RATE = .005;   // 生き
 const scoreMul = () => 1 + .05 * ab('unchiku');   // 運籌帷幄: 買った回数ぶん、スコア+5%ずつ
 const scoreParts = () => { const t = Math.floor(G.t) * SCORE_PER_SEC, k = Math.round((G.killScore !== undefined ? G.killScore : (G.kills || 0)) * SCORE_PER_KILL), hits = G.hitsTaken || 0, hitMul = Math.pow(1 - SCORE_HIT_RATE, hits), h = -Math.round((t + k) * (1 - hitMul)), base = Math.max(0, t + k + h), m = scoreMul(); return { t, k, h, hits, hitPct: (1 - hitMul) * 100, base, mul: m, total: Math.round(base * m) }; };   // 被弾のペナルティは、(生存+撃破)の割合(被弾1回ごとに、0.5%ずつ。掛け算なので、0にならない)
 const stageT = () => G.t - (G.tBase || 0);   // ステージの経過秒(輪廻転生のあと、最初からやり直し。時計の G.t は、戻らない)
-const vsec = () => { const t = stageT(); return G.mode === 'end' ? t * (1 + t / END_ACCEL) : t * ((G.cfg && G.cfg.timeScale) || 1); };   // 敵が強くなるための、仮想の経過秒(退魔モードは、短い分、速く進む)
+const vsec = () => { const t = stageT(); return G.mode === 'end' ? t * (1 + t / END_ACCEL) : t * ((G.cfg && G.cfg.timeScale) || 1) * ((G.diff && G.diff.ts) || 1); };   // 敵が強くなるための、仮想の経過秒(退魔モードは、短い分、速く進む)
 const hpMul = () => 1 + CFG.hpPer5min * (G.mode === 'end' ? END_HP_UP : 1) * (vsec() / 300);
 const bossMul = () => G.mode === 'end' ? 1 + .5 * Math.floor(vsec() / 1200) : 1;
 const hw = () => W / 2 / U, hh = () => H / 2 / U;
@@ -1510,7 +1510,7 @@ const DIFF_COL = { normal:'#9ad8a0', hard:'#ffd45e', expert:'#ff8a7a', nightmare
 const DIFF_TARGET = { normal:100, hard:170, expert:350, nightmare:600, lunatic:3600, absolute:25200 };   // アブソリュートは、ルナティックの7倍   // ルナティックは、全ての強化(巻物・基礎力・雇用・賽銭100回)を、した状態を、想定する(強化済みの戦闘力は、初期の約3倍)
 const DIFF_HD = { hard:1.1, expert:1.25, nightmare:1.6, lunatic:5.2, absolute:24 };   // 敵の体力・攻撃力・ボスの体力の倍率。出現数は、目標のきびしさに合うように、自動で決まる
 const DIFFS = (() => {
-  const N = { n:DIFF_NAME.normal, hp:.8, dmg:.75, spawn:.86, boss:.75 }, p0 = Math.sqrt(N.hp * N.dmg) * N.spawn, o = { normal:N };
+  const N = { n:DIFF_NAME.normal, hp:.8, dmg:.75, spawn:.86, boss:.75, ts:.7, tengu:.4 }, p0 = Math.sqrt(.8 * .75) * .86, o = { normal:N };   // ノーマルだけ、時間による強くなり方を×0.7(ts)に、天狗の出やすさを×0.4(tengu)に。ハード以上は、p0を前のまま固定しているので、変わらない
   for (const k in DIFF_HD){ const hd = DIFF_HD[k]; o[k] = { n:DIFF_NAME[k], hp:hd, dmg:hd, spawn:+(DIFF_TARGET[k] / 100 * p0 / hd).toFixed(3), boss:hd }; }
   return o;
 })();
@@ -1558,7 +1558,7 @@ function ringPos(extra, ang){
   return { x: G.p.x + Math.cos(a) * R, y: G.p.y + Math.sin(a) * R, a };
 }
 function pickType(m){
-  const w = G.cfg.pool(m);
+  const w = G.cfg.pool(m).map(x => (x[0] === 'tengu' && G.diff && G.diff.tengu) ? [x[0], x[1] * G.diff.tengu] : x);   // ノーマル: 天狗の出やすさを下げる
   let sum = 0; for (const x of w) sum += x[1];
   let r = Math.random() * sum;
   for (const x of w){ r -= x[1]; if (r <= 0) return x[0]; }
