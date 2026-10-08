@@ -1429,7 +1429,7 @@ function kill(e){
   if (e.type === 'kin'){ const nk = Math.round(KIN_KOBAN * dropMul()) + gk; for (let i = 0; i < nk; i++) spawnItem('koban', e.x + rnd(-1.5, 1.5), e.y + rnd(-1.5, 1.5)); }   // 金の妖怪は、小判をたくさん落とす(拾いやすいよう、少し広めに散らす)
   if (T.item){ if (Math.random() < BOSS_ITEM_RATE * itemMul) spawnItem(T.item, e.x, e.y); }   // ミニボス・中ボスの勾玉は、確実ではなくなった
   else if (!T.boss){
-    const r = Math.random(), a = (T.mid ? ONIGIRI_MID : ONIGIRI_ZAKO) * dropMul() * itemMul;
+    const r = Math.random(), a = (T.mid ? ONIGIRI_MID : ONIGIRI_ZAKO) * dropMul() * itemMul * ((G.diff && G.diff.rice) || 1);
     if (r < a) spawnItem('onigiri', e.x, e.y);
     else if (r < a + (T.mid ? MAGATAMA_MID : MAGATAMA_ZAKO) * itemMul) spawnItem('magatama', e.x, e.y);
   }
@@ -1511,9 +1511,10 @@ const DIFF_COL = { normal:'#9ad8a0', hard:'#ffd45e', expert:'#ff8a7a', nightmare
 /* 難易度の強さ: ノーマルを100としたときの、きびしさの目標(画面には出さない)。きびしさ = 「√(体力×攻撃力) × 出現数」を、ノーマルと比べた値 */
 const DIFF_TARGET = { normal:100, hard:170, expert:350, nightmare:600, lunatic:3600, absolute:25200 };   // アブソリュートは、ルナティックの7倍   // ルナティックは、全ての強化(巻物・基礎力・雇用・賽銭100回)を、した状態を、想定する(強化済みの戦闘力は、初期の約3倍)
 const DIFF_HD = { hard:1.1, expert:1.25, nightmare:1.6, lunatic:5.2, absolute:24 };   // 敵の体力・攻撃力・ボスの体力の倍率。出現数は、目標のきびしさに合うように、自動で決まる
+const DIFF_RICE = { normal:1.6, hard:1, expert:.85, nightmare:.7, lunatic:.55, absolute:.4 };   // 難易度ごとの、おにぎりの出やすさ(ふつうの敵・中ボスのドロップ率にかける。ハードが、これまでと同じ)
 const DIFFS = (() => {
-  const N = { n:DIFF_NAME.normal, hp:.8, dmg:.75, spawn:.86, boss:.65, ts:.7, tengu:.4, ev:.92, wv:.85 }, p0 = Math.sqrt(.8 * .75) * .86, o = { normal:N };   // ノーマルだけ、時間による強くなり方を×0.7(ts)に、天狗の出やすさを×0.4(tengu)に。ハード以上は、p0を前のまま固定しているので、変わらない
-  for (const k in DIFF_HD){ const hd = DIFF_HD[k]; o[k] = { n:DIFF_NAME[k], hp:hd, dmg:hd, spawn:+(DIFF_TARGET[k] / 100 * p0 / hd).toFixed(3), boss:hd }; }
+  const N = { n:DIFF_NAME.normal, hp:.8, dmg:.75, spawn:.86, boss:.65, ts:.7, tengu:.4, ev:.92, wv:.85, rice:DIFF_RICE.normal, midb:.9 }, p0 = Math.sqrt(.8 * .75) * .86, o = { normal:N };   // ノーマルだけ、時間による強くなり方を×0.7(ts)に、天狗の出やすさを×0.4(tengu)に。ハード以上は、p0を前のまま固定しているので、変わらない
+  for (const k in DIFF_HD){ const hd = DIFF_HD[k]; o[k] = { n:DIFF_NAME[k], hp:hd, dmg:hd, spawn:+(DIFF_TARGET[k] / 100 * p0 / hd).toFixed(3), boss:hd, rice:DIFF_RICE[k] }; }
   return o;
 })();
 const diffPower = k => { const d = DIFFS[k]; return Math.sqrt(d.hp * d.dmg) * d.spawn; };
@@ -1546,7 +1547,7 @@ const FINAL_RAID = 2.2;   // 第5地(最終ステージ)の主は、さらに体
 const CINE_REVEAL = 9.4, CINE_END = 10.2;   // 暗転の演出: 主が現れる時刻、演出が終わる時刻(秒)
 function spawnEnemy(type, x, y, o){
   const T = ET[type];
-  const m = (T.boss ? bossMul() : hpMul()) * (!T.boss ? 1 : (o && o.final) ? BOSS_HP.final * ((G.mode === 'run' && G.mapIdx === 4) ? FINAL_RAID : 1) : T.mini ? BOSS_HP.mini : BOSS_HP.mid);
+  const m = (T.boss ? bossMul() : hpMul()) * (!T.boss ? 1 : (o && o.final) ? BOSS_HP.final * ((G.mode === 'run' && G.mapIdx === 4) ? FINAL_RAID : 1) : T.mini ? BOSS_HP.mini : BOSS_HP.mid * ((G.diff && G.diff.midb) || 1));
   const bst = G.cfg.boost, e = { type, x, y, hp: T.hp * m * ((o && o.hpMul) || 1) * (bst && !T.boss ? bst.hp : 1) * (T.boss ? 1 : (G.cfg.hard || 1)) * ((G.diff && (T.boss ? G.diff.boss : G.diff.hp)) || 1), r: T.r, spd: T.spd, dmg: T.dmg * (bst ? bst.dmg : 1) * (G.cfg.hard || 1) * ((G.diff && G.diff.dmg) || 1), t: rnd(0, 10), flash: 0,
     slow: 1, slowT: 0, dot: null, wbT: -9, st: 0, stT: rnd(1.5, 3.5), dead: false, vx: 0, vy: 0,
     line: false, flee: !!T.flee, life: 99, boss: !!T.boss, dx: 0, dy: 0, n: 0 };
