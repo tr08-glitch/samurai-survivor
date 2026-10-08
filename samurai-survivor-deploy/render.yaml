@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: samurai-survivor
+    runtime: static
+    buildCommand: "true"
+    staticPublishPath: .
