@@ -4698,13 +4698,13 @@ function renderEnemyDex(list){
   enemyDexGroups().forEach((arr, ti) => {
     const h = document.createElement('div'); h.className = 'dxsep'; h.textContent = names[ti]; list.appendChild(h);
     for (const { id, maps } of arr){
-      const r = document.createElement('div'); r.className = 'dxrow en';
+      const on = dexOpenAll || (ek[id] || 0) > 0, r = document.createElement('div'); r.className = 'dxrow en' + (on ? '' : ' un');   // 倒した敵だけ解禁。まだの敵は、？？？と黒いシルエット
       r.innerHTML = '<div class="ic"></div><div><div class="nm"></div><div class="st"></div><div class="st mp"></div></div>';
       const src = ENEMY_SRC[ENEMY_ALIAS[id] || id], ic = r.querySelector('.ic');
-      if (src){ const im = document.createElement('img'); im.src = src; im.alt = ''; im.draggable = false; ic.appendChild(im); } else ic.textContent = '？';
-      r.querySelector('.nm').textContent = ET[id].n;
-      r.querySelector('.st').textContent = '累計撃破数 ' + (ek[id] || 0).toLocaleString('ja-JP') + '体';
-      r.querySelector('.mp').textContent = '出現マップ:' + maps.join('・');
+      if (src){ const im = document.createElement('img'); im.src = src; im.alt = ''; im.draggable = false; if (!on) im.className = 'sil'; ic.appendChild(im); } else ic.textContent = '？';
+      r.querySelector('.nm').textContent = on ? ET[id].n : '？？？';
+      r.querySelector('.st').textContent = on ? '累計撃破数 ' + (ek[id] || 0).toLocaleString('ja-JP') + '体' : '？？？';
+      r.querySelector('.mp').textContent = on ? '出現マップ:' + maps.join('・') : '？？？';
       list.appendChild(r);
     }
   });
