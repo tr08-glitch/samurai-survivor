@@ -165,6 +165,21 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 #bossbar .bn{ display:flex; justify-content:space-between; font-family:var(--font-display); font-weight:800; font-size:14px; letter-spacing:.12em; text-shadow:0 1px 4px #000; margin-bottom:3px; }
 #bossbar .bb{ height:14px; border:1px solid rgba(255,120,100,.8); background:rgba(0,0,0,.6); border-radius:2px; overflow:hidden; box-shadow:0 0 12px rgba(255,70,50,.35); }
 #bossbar .bb i{ display:block; height:100%; width:100%; background:linear-gradient(#ff6a5a,#b3261e); transform-origin:left; }
+#credits{ background:rgba(8,11,22,.86); justify-content:flex-start; padding-top:calc(18px + env(safe-area-inset-top,0px)); }
+#credits h2{ font-family:var(--font-display); letter-spacing:.3em; margin:4px 0 8px; }
+#credlist{ width:min(460px,92vw); flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch; margin-bottom:12px; padding:0 4px 12px; }
+.cgrp{ margin:16px 0 6px; padding-bottom:4px; border-bottom:1px solid rgba(216,180,90,.5); font-family:var(--font-display); font-weight:800; font-size:16px; letter-spacing:.2em; color:var(--kin); }
+.cmain{ margin:8px 0 2px; font-family:var(--font-display); font-weight:800; font-size:22px; letter-spacing:.2em; text-align:center; }
+.cname{ margin:0 0 4px; font-size:15px; font-weight:700; text-align:center; }
+.cl{ list-style:none; margin:0; padding:0; }
+.cl li{ padding:6px 2px; font-size:13.5px; line-height:1.55; border-bottom:1px dotted rgba(228,234,241,.18); }
+.cl li b{ display:inline-block; min-width:5.5em; margin-right:.7em; font-size:12px; color:var(--kin); font-weight:700; }
+.cl li span{ font-size:12px; color:var(--moon-dim); }
+.credlink,#credlist a{ }
+#credlist a{ color:#9fd8ff; word-break:break-all; }
+.cnote{ margin:8px 2px 0; font-size:12px; line-height:1.7; color:var(--moon-dim); }
+.cnote.cend{ margin-top:20px; text-align:center; font-family:var(--font-display); font-size:14px; color:var(--moon); }
+.credlink{ margin:6px 0 0; padding:6px 14px; border:1px solid rgba(228,234,241,.3); border-radius:4px; background:rgba(13,18,33,.55); font-size:12px; color:var(--moon-dim); }
 #settings{ background:rgba(8,11,22,.8); }
 #settings h2{ font-family:var(--font-display); letter-spacing:.3em; margin:0 0 14px; }
 #setlist{ width:min(420px,92vw); margin-bottom:18px; }
@@ -386,7 +401,7 @@ html.rot #rotateHint{ display:flex; }
 @media (orientation:landscape) and (max-height:560px){
   .screen{ padding:8px max(14px, env(safe-area-inset-right,0px)) 8px max(14px, env(safe-area-inset-left,0px)); }
   #maps, #chars, #shop, #titles{ padding-top:calc(8px + env(safe-area-inset-top,0px)); padding-bottom:6px; }
-  #maps h2, #chars h2, #shop h2, #titles h2, #settings h2, #dex h2{ font-size:19px; margin:0 0 2px; letter-spacing:.16em; }
+  #maps h2, #chars h2, #shop h2, #titles h2, #settings h2, #dex h2, #credits h2{ font-size:19px; margin:0 0 2px; letter-spacing:.16em; }
   #maps .hint, #chars .hint, #shop .hint, #titles .hint{ margin:0 0 4px; font-size:11px; }
   .wallet{ font-size:15px; margin:0 0 4px; }
   .tabs{ margin:0 0 6px; gap:5px; } .tabs button{ padding:5px 12px; font-size:13px; }
@@ -483,6 +498,7 @@ html.rot #rotateHint{ display:flex; }
     <button class="modebtn" id="mShop">強化<small id="shopSub">小判で永続的に強くなる</small></button>
     <button class="modebtn" id="mTitles">称号<small id="titlesSub">条件を満たすと、能力や新しい装備を得る</small></button>
     <button class="modebtn" id="mDex">図鑑<small id="dexSub">武器・妖術・防具・巻物・奥義・キャラの、記録を見る</small></button>
+    <button class="credlink" id="bCred">クレジット</button>
     <p class="ver">試作 v0.1 ／ 操作:画面をドラッグして移動(PCは WASD・矢印キー)。攻撃は自動。<br>キャラは侍(大太刀)のみ。</p>
   </section>
 
@@ -547,6 +563,50 @@ html.rot #rotateHint{ display:flex; }
     <div class="row3"><button class="btn" id="cBack">戻る</button><button class="btn sm" id="cAll">試遊用:全員解放</button></div>
   </section>
 
+  <section id="credits" class="screen hide">
+    <h2>クレジット</h2>
+    <div id="credlist">
+      <div class="cgrp">制作</div>
+      <p class="cmain">侍サバイバー</p>
+      <p class="cname">作者:trの中の人</p>
+      <div class="cgrp">BGM</div>
+      <ul class="cl">
+        <li><b>タイトル画面</b>「紫桜の妖、千夜の夢の主」<br><span>ユーフルカ(ユーフルカのゲーム音楽とDTMちゃんねる)<br><a href="https://www.youtube.com/watch?v=Iw1GutsALoo" target="_blank" rel="noopener noreferrer">YouTube</a></span></li>
+        <li><b>序盤</b>「鳴ラヌ弦(ならぬいと)」<br><span>3freeBGM<br><a href="https://www.youtube.com/watch?v=PxkdDlt185c" target="_blank" rel="noopener noreferrer">YouTube</a></span></li>
+        <li><b>終盤</b>「陰の封印」<br><span>パンダの中のパンダ<br><a href="https://www.youtube.com/watch?v=inV0ooEWtMo" target="_blank" rel="noopener noreferrer">YouTube</a></span></li>
+        <li><b>百鬼夜行</b>「朧神」(和風×TRAP/戦闘BGM/ボス戦)<br><span>zippy<br><a href="https://www.youtube.com/watch?v=Hf6JXQg_Lw8" target="_blank" rel="noopener noreferrer">YouTube</a></span></li>
+        <li><b>ボス戦</b>「零の旋律」<br><span>nons works<br><a href="https://www.youtube.com/watch?v=tI-6AyZP4ng" target="_blank" rel="noopener noreferrer">YouTube</a></span></li>
+      </ul>
+      <p class="cnote">いずれもフリーBGMとして公開されている曲を、ゲームに合わせて切り出して使っています。</p>
+      <div class="cgrp">効果音</div>
+      <p class="cnote" style="margin:0 2px 4px">効果音ラボ&nbsp;<a href="https://soundeffect-lab.info/sound/button/" target="_blank" rel="noopener noreferrer">soundeffect-lab.info</a><br>On-Jin〜音人〜&nbsp;<a href="https://on-jin.com/sound/index.php?kensaku=%E9%88%B4" target="_blank" rel="noopener noreferrer">on-jin.com</a>(鈴の音・賽銭の音)</p>
+      <ul class="cl">
+        <li><b>賽銭の音</b>sei_ge_jinja_suzu02<br><span>On-Jin〜音人〜</span></li>
+        <li><b>鈴の音</b>ジングルベル01<br><span>On-Jin〜音人〜</span></li>
+        <li><b>残魂を拾う音</b>カーソル移動9</li>
+        <li><b>ボタンを押す音</b>決定ボタンを押す50</li>
+        <li><b>おにぎりを拾う音</b>ゲージ回復2</li>
+        <li><b>火遁</b>火炎魔法1</li>
+        <li><b>風遁</b>風魔法2</li>
+        <li><b>月光</b>オーラ1</li>
+        <li><b>水遁</b>VSQSE_0799_Ukiha_Tsuzura_Tanada_02<br><span>効果音ラボ</span></li>
+        <li><b>勾玉の効果中の音</b>ゲージ回復1(加工)</li>
+      </ul>
+      <p class="cnote">武器・妖術の効果音(大太刀・草薙剣・小刀・薙刀・長巻・槍・火縄銃・弓・吹き矢・手裏剣・撒菱・苦無・鎖鎌・憑依・八咫鏡・蒼炎・変わり身 など)は、作者がプログラムで作成しました。上の効果音は、一部を加工して使っています。</p>
+      <div class="cgrp">画像</div>
+      <p class="cnote">アイコン・背景などの画像は、画像生成AI(ChatGPT・Gemini・Adobe Firefly)で作成した画像を、作者が選んで使っています。</p>
+      <div class="cgrp">使用ツール</div>
+      <ul class="cl">
+        <li><b>ゲーム制作</b>Claude(Anthropic)</li>
+        <li><b>画像生成</b>ChatGPT(OpenAI)/ Gemini(Google)/ Adobe Firefly</li>
+        <li><b>フォント</b>Shippori Mincho B1・Zen Kaku Gothic New(Google Fonts / SIL Open Font License)</li>
+        <li><b>公開</b>GitHub / Render</li>
+      </ul>
+      <p class="cnote cend">遊んでくれて、ありがとう。</p>
+    </div>
+    <div class="row2"><button class="btn" id="credBack">戻る</button></div>
+  </section>
+
   <section id="settings" class="screen hide">
     <h2>設定</h2>
     <div id="setlist">
@@ -556,6 +616,8 @@ html.rot #rotateHint{ display:flex; }
       <div class="sgrp">画面</div>
       <div class="setrow"><label for="rBr">光度</label><input type="range" id="rBr" min="1" max="10" step="1"><b id="vBr"></b></div>
       <p class="shint">0は無音です。音量・光度は、5が標準です(光度は1〜10)。</p>
+      <div class="sgrp">その他</div>
+      <button class="btn" id="sCred">クレジット</button>
       <div class="sgrp dng">データ</div>
       <button class="btn danger" id="sWipe">データを削除</button>
       <p class="shint">この端末に保存された、ゲームの記録(小判・強化・称号・図鑑・賽銭・解放したキャラ・クリア記録・途中のゲーム)を、すべて消します。</p>
@@ -859,7 +921,7 @@ const WEAPONS = {
     base:{ kb:0.35, dmg:12, cd:2.0, dur:2.4, bounce:1, count:1 },
     lv:[['ダメージ+20%',{d:.2}],['持続時間+20%',{du:.2}],['CT-10%',{c:.1}],['同時に飛ぶ数+1',{n:1}],['ダメージ+20%',{d:.2}],['持続時間+30%',{du:.3}],['持続時間+20%、同時に飛ぶ数+1',{du:.2,n:1}]] },
   makibishi:{ n:'撒菱', ab:'菱', type:'zone', col:'#c9b27a', desc:'足元にしばらく残る撒菱。踏んだ敵にダメージ',
-    base:{ kb:0, dmg:4.6, cd:3.0, dur:5.0, r:.9, max:2 },
+    base:{ kb:0, dmg:4.6, cd:6.0, dur:25.0, r:.9, max:2 },
     lv:[['ダメージ+20%',{d:.2}],['設置数+1',{m:1}],['持続時間+20%、ダメージの間隔-10%',{du:.2,tk:.1}],['範囲+20%',{a:.2}],['ダメージ+20%、ダメージの間隔-10%',{d:.2,tk:.1}],['設置数+1',{m:1}],['踏んだ敵の移動速度-30%、ダメージの間隔-10%',{slow:1,tk:.1}]] },
   kunai:{ n:'苦無', ab:'苦', type:'kunai', only:'kunoichi', col:'#c9d2e0', desc:'近くに敵がいれば、小刀と同じ範囲(小さな扇)で斬る。遠くにいれば、吹き矢のように、別々の敵へ苦無を投げる。CTは短め(くのいち専用)',
     base:{ kb:0.3, dmg:6, cd:1.0, range:9, count:3, hits:2, near:1.9, arc:90, dur:.15 },
@@ -3992,7 +4054,7 @@ const MAPS = [
   { name:'荒れ寺', enemies:'唐傘小僧・骸骨・ろくろ首・火の玉', boss:'がしゃどくろ', reward:'女武芸者', clear:192, min:10, ready:true },
   { name:'竹林', enemies:'鎌鼬・狐火・化け猫・天狗', boss:'九尾の狐', reward:'忍者', clear:252, min:10, ready:true },
   { name:'山の洞窟', enemies:'小蜘蛛・小鬼・河童・大蜘蛛', boss:'酒呑童子', reward:'陰陽師', clear:336, min:15, ready:true },
-  { name:'魔の都', enemies:'ここまでの敵の強化版', boss:'鵺(仮)', reward:'猟師', clear:440, min:15, ready:true }
+  { name:'魔の都', enemies:'ここまでの敵の強化版', boss:'鵺', reward:'猟師', clear:440, min:15, ready:true }
 ];
 const CHARS = [
   { id:'samurai', name:'侍', weapon:'odachi', spell:null, trait:'全体ダメージ+5%', ch:{ wd:1.05, sd:1.05 } },
@@ -4120,6 +4182,14 @@ function closeSettings(){ $('settings').classList.add('hide'); $(setFrom).classL
 $('bSet').addEventListener('click', () => openSettings('title'));
 $('bSet2').addEventListener('click', () => openSettings('pause'));
 $('setBack').addEventListener('click', closeSettings);
+/* ================= クレジットの画面 ================= */
+let credFrom = 'title';
+function openCredits(from){ credFrom = from; $(from).classList.add('hide'); $('credits').classList.remove('hide'); $('credlist').scrollTop = 0; }
+function closeCredits(){ $('credits').classList.add('hide'); $(credFrom).classList.remove('hide'); }
+$('bCred').addEventListener('click', () => openCredits('title'));
+$('sCred').addEventListener('click', () => openCredits('settings'));
+$('credBack').addEventListener('click', closeCredits);
+
 /* データの削除: 確認の画面で「すべて削除する」を押すと、この端末の、ゲームの保存データ(ss_で始まるもの)を消して、読み込み直す */
 function wipeAllData(){
   wiping = true; stopOfferHold && stopOfferHold();
