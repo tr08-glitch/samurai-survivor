@@ -265,6 +265,8 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 .ddopt.lock{ opacity:.4; border-style:dashed; pointer-events:none; } .ddopt:disabled{ pointer-events:none; }
 #diffDlg .dh{ margin:8px 0 0; font-size:11.5px; line-height:1.55; color:var(--moon-dim); } #diffDlg .ddbtn{ display:flex; justify-content:center; margin-top:8px; } #diffDlg .ddbtn .btn{ padding:7px 22px; }
 .tabs button.lock{ opacity:.45; border-style:dashed; } .tabs button:disabled{ pointer-events:none; }
+#lockHint{ position:fixed; left:50%; top:18%; transform:translateX(-50%); max-width:86vw; padding:10px 16px; border-radius:6px; background:rgba(8,12,24,.94); border:1px solid var(--kin); color:#f4f7ff; font-weight:700; font-size:14px; line-height:1.6; text-align:center; z-index:60; pointer-events:none; display:none; }
+#lockHint.show{ display:block; }
 @media (orientation:landscape) and (max-height:560px){ #diffDlg .dd{ padding:8px 12px 8px; } #diffDlg h3{ font-size:17px; } #ddList{ gap:4px; } .ddopt{ padding:5px 10px; font-size:13.5px; } .ddopt .dr{ font-size:10.5px; } #diffDlg .dh{ margin-top:5px; font-size:10.5px; } }
 .dhint{ margin:0 0 8px; font-size:11.5px; color:var(--moon-dim); text-align:center; line-height:1.5; max-width:420px; }
 .offer{ display:flex; flex-direction:column; gap:10px; align-items:stretch; padding:4px 2px; }
@@ -935,7 +937,7 @@ const WEAPONS = {
     base:{ kb:0, dmg:4.6, cd:6.0, dur:25.0, r:.9, max:2 },
     lv:[['ダメージ+20%',{d:.2}],['設置数+1',{m:1}],['持続時間+20%、ダメージの間隔-10%',{du:.2,tk:.1}],['範囲+20%',{a:.2}],['ダメージ+20%、ダメージの間隔-10%',{d:.2,tk:.1}],['設置数+1',{m:1}],['踏んだ敵の移動速度-30%、ダメージの間隔-10%',{slow:1,tk:.1}]] },
   kunai:{ n:'苦無', ab:'苦', type:'kunai', only:'kunoichi', col:'#c9d2e0', desc:'近くに敵がいれば、小刀と同じ範囲(小さな扇)で斬る。遠くにいれば、吹き矢のように、別々の敵へ苦無を投げる。CTは短め(くのいち専用)',
-    base:{ kb:0.3, dmg:6, cd:1.0, range:9, count:3, hits:2, near:1.9, arc:90, dur:.15 },
+    base:{ kb:0.3, dmg:6, cd:1.15, range:9, count:3, hits:2, near:1.9, arc:90, dur:.15 },
     lv:[['ダメージ+20%',{d:.2}],['近くの扇の範囲+15%、投げる苦無の射程+15%',{a:.15,x:.15}],['投げる苦無+1(4本)',{n:1}],['ダメージ+20%、CT-8%',{d:.2,c:.08}],['近くで斬るとき、二連斬り(0.12秒おいて、同じ向きへ、もう1回斬る)',{twin:1}],['投げる苦無の貫通+1(3体)、射程+15%',{p:1,x:.15}],['投げる苦無+2(6本)、ダメージ+30%、近くの扇の範囲+15%',{n:2,d:.3,a:.15}]] },
   kusarigama:{ n:'鎖鎌', ab:'鎖', type:'spin', col:'#d9dfe6', desc:'鎖鎌を振り回して、自分の周りを1周する',
     base:{ kb:0.6, dmg:15, cd:2.2, r:2.4, dur:.5 },
@@ -1147,7 +1149,7 @@ function newGame(mode, charId, mapIdx){
         weapons:(C.weapons || [C.weapon]).filter(Boolean).map((id, i) => ({ id, lv:1, t:.4 + i * .25 })), spells:[], armor:{}, scrolls:{},
         art:null, buffT:0, buffMul:1, hasSub:false, sub:{ ready:false, t:0 },
         windT:0, windN:0, windAng:0, windDmg:0, windR:2, hitFlash:0, faceX:1, moving:false,
-        ch: Object.assign({ wd:1, sd:1, hp:1, area:1, spd:1, scd:1, low:0, far:0, taken:1, inv:0, soul:1, pick:1, revive:0, wcd:1, extra:0, lightHeal:0, spellBias:0 }, C.ch), revived:false }
+        ch: Object.assign({ wd:1, sd:1, hp:1, area:1, spd:1, scd:1, low:0, far:0, taken:1, inv:0, soul:1, pick:1, revive:0, wcd:1, hcd:1, extra:0, lightHeal:0, spellBias:0 }, C.ch), revived:false }
   };
   if (C.spell){
     G.p.spells.push({ id: C.spell, lv:1, t:0 });
@@ -1510,7 +1512,7 @@ const DIFF_COL = { normal:'#9ad8a0', hard:'#ffd45e', expert:'#ff8a7a', nightmare
 const DIFF_TARGET = { normal:100, hard:170, expert:350, nightmare:600, lunatic:3600, absolute:25200 };   // アブソリュートは、ルナティックの7倍   // ルナティックは、全ての強化(巻物・基礎力・雇用・賽銭100回)を、した状態を、想定する(強化済みの戦闘力は、初期の約3倍)
 const DIFF_HD = { hard:1.1, expert:1.25, nightmare:1.6, lunatic:5.2, absolute:24 };   // 敵の体力・攻撃力・ボスの体力の倍率。出現数は、目標のきびしさに合うように、自動で決まる
 const DIFFS = (() => {
-  const N = { n:DIFF_NAME.normal, hp:.8, dmg:.75, spawn:.86, boss:.75, ts:.7, tengu:.4 }, p0 = Math.sqrt(.8 * .75) * .86, o = { normal:N };   // ノーマルだけ、時間による強くなり方を×0.7(ts)に、天狗の出やすさを×0.4(tengu)に。ハード以上は、p0を前のまま固定しているので、変わらない
+  const N = { n:DIFF_NAME.normal, hp:.8, dmg:.75, spawn:.86, boss:.65, ts:.7, tengu:.4, ev:.92, wv:.85 }, p0 = Math.sqrt(.8 * .75) * .86, o = { normal:N };   // ノーマルだけ、時間による強くなり方を×0.7(ts)に、天狗の出やすさを×0.4(tengu)に。ハード以上は、p0を前のまま固定しているので、変わらない
   for (const k in DIFF_HD){ const hd = DIFF_HD[k]; o[k] = { n:DIFF_NAME[k], hp:hd, dmg:hd, spawn:+(DIFF_TARGET[k] / 100 * p0 / hd).toFixed(3), boss:hd }; }
   return o;
 })();
@@ -1586,7 +1588,7 @@ const EV = {
   sho:{ n:'小さな百鬼の行列', f(){ band(Math.random() * TAU, 16, G.cfg.band.slice(0, 2)); } },
   gyouretsu:{ n:'百鬼の行列', f(){ band(Math.random() * TAU, 44, G.cfg.band); } },
   onibi:{ n:'鬼火の輪', f(){
-    const nb = Math.round(52 * dens());
+    const nb = Math.round(52 * dens() * evMul());
     for (let i = 0; i < nb; i++){ const q = ringPos(.4, i / nb * TAU); spawnEnemy(i % 2 ? (G.cfg.fire || 'hinotama') : 'oni', q.x, q.y); }
   } },
   hasami:{ n:'挟み撃ち', f(){
@@ -1598,7 +1600,7 @@ const EV = {
     const wave = () => {
       const R = ringR() + 1.5, sx = G.p.x + Math.cos(a) * R, sy = G.p.y + Math.sin(a) * R;   // 2回目以降も、そのときの、プレイヤーの位置を基準に出す
       const dir = unit(G.p.x - sx, G.p.y - sy), perp = { x: -dir.y, y: dir.x };
-      const ns = Math.round(14 * dens());
+      const ns = Math.round(14 * dens() * evMul());
       for (let i = 0; i < ns; i++){
         const off = (i - (ns - 1) / 2) * 1.0;
         spawnEnemy('karakasa', sx + perp.x * off, sy + perp.y * off, { line: true, vx: dir.x * 6.2, vy: dir.y * 6.2, life: 9 });
@@ -1620,7 +1622,7 @@ const EV = {
     const m = vsec() / 60, per = 2 + Math.floor(m / 10), dn = dens();
     banner('四方八方から、押し寄せる!', 'boss');
     for (let i = 0; i < 14; i++) later(i * .5, () => {
-      const a0 = rnd(0, TAU), n = Math.max(1, Math.round(per * dn));
+      const a0 = rnd(0, TAU), n = Math.max(1, stochRound(per * dn * evMul() * ((G.diff && G.diff.wv) || 1)));   // ノーマル: 百鬼の大波(四方から押し寄せる)は、さらに少し減らす
       for (let d = 0; d < 8; d++) for (let k = 0; k < n; k++){
         if (G.enemies.length >= hardCapN()) return;
         const q = ringPos(rnd(0, SPAWN_JITTER), a0 + d * TAU / 8 + rnd(-.22, .22)); spawnEnemy(pickType(m), q.x, q.y);
@@ -1670,8 +1672,10 @@ function updateCine(dt){
   if (c.spawned){ c.flash = Math.max(0, c.flash - dt / .9); $('cFlash').style.opacity = c.flash; G.shk = Math.max(0, G.shk - dt * 14); }
   if (t >= CINE_END){ G.cine = null; G.shk = 0; $('cine').classList.remove('on'); $('cFlash').style.opacity = 0; for (const id of ['cT1', 'cT2', 'cBig', 'cName']) $(id).style.opacity = 0; }
 }
+const evMul = () => (G.diff && G.diff.ev) || 1;   // ノーマル: イベントの敵の数を、ほんの少し減らす
+const stochRound = x => { const f = Math.floor(x); return f + (Math.random() < x - f ? 1 : 0); };   // 小数を、確率で切り上げ・切り捨て(平均が、そのままになる)
 function band(a, n, types){
-  n = Math.round(n * dens());
+  n = Math.round(n * dens() * evMul());
   const dir = { x: Math.cos(a), y: Math.sin(a) }, perp = { x: -dir.y, y: dir.x }, R = ringR() + 1.2;
   for (let i = 0; i < n; i++){
     const off = (i - (n - 1) / 2) * .78, row = (i % 2) * .9;
@@ -1896,7 +1900,7 @@ function doFire(D, s, dm, k, N){
         const j = k * n + i, tg = tl[j];   // 1本ごとに、別々の敵を狙う(敵が足りなければ、少しずらして撃つ)
         const a = tg ? Math.atan2(tg.y - p.y, tg.x - p.x) : base0 + (j - (n * N - 1) / 2) * .16;
         shoot({ vx: Math.cos(a) * 14, vy: Math.sin(a) * 14, dmg, r: .22, hits: 2, life: s.range * s.rngMul / 14, col: D.col, kind:'dart', poison: !!s.poison, kb: s.kb });
-        if (fxReady('dartPuff') && i === 0) fxAt('dartPuff', p.x + Math.cos(a) * .4, p.y + Math.sin(a) * .4, a, 1.5 / FX.dartPuff.k, .26);   // 吹く瞬間: 小さな息の輪
+        if (fxReady('dartPuff') && i === 0) fxAt('dartPuff', p.x + Math.cos(a) * .4, p.y + Math.sin(a) * .4, a, .9 / FX.dartPuff.k, .26);   // 吹く瞬間: 小さな息の輪
       }
       break; }
     case 'shuriken': {
@@ -1946,7 +1950,7 @@ const mirrorMul = () => G.p.mirrorT > 0 ? (G.p.mirrorM || 1.4) : 1;   // 八咫�
 const mirrorCount = (n, mm) => Math.round(n * mm + 1e-9);   // 元の数 × 倍率。小数点以下は、四捨五入
 function fireSpell(sp){
   const D = SPELLS[sp.id], s = statsOf(D, sp.lv), p = G.p, ar = gArea(), mm = mirrorMul();
-  const times = 1 + extraTimes(), cd = (s.cd || 1) * s.cdMul * gSCd();
+  const times = 1 + extraTimes(), cd = (s.cd || 1) * s.cdMul * gSCd() * (sp.id === 'hyoui' ? p.ch.hcd : 1);
   const dmgBase = ((s.dmg || 0) + offAtk()) * s.dmgMul * gSDmg();
   switch (sp.id){
     case 'guren':
@@ -2099,7 +2103,7 @@ function playerHit(e){
 const BOSS_SKILLS = {
   rokuro:    [ { n:'首の一回転', t:'sweep', len:4.2, w:.85, warn:1.0, dur:1.1, mul:1.5 }, { n:'頭突き', t:'line', len:6.5, w:1.3, warn:.8, mul:1.7 } ],
   ushioni:   [ { n:'角の突き上げ', t:'cone', R:3.4, arc:1.7, warn:.85, mul:1.7 }, { n:'地ならし', t:'circle', R:2.8, warn:1.0, mul:1.6, at:'self' } ],
-  oniTaisho: [ { n:'金棒の振り下ろし', t:'circle', R:3.6, warn:1.2, mul:2.3, at:'front', fx:'slam' }, { n:'地割れ', t:'ring', R:7.5, w:1.2, warn:1.1, dur:.8, mul:1.7 } ],
+  oniTaisho: [ { n:'金棒の振り下ろし', t:'circle', R:3.6, warn:1.8, mul:2.3, at:'front', fx:'slam' }, { n:'地割れ', t:'ring', R:7.5, w:1.2, warn:1.6, dur:1.4, mul:1.7 } ],
   gasha:     [ { n:'骨の雨', t:'rain', R:1.7, n2:7, warn:1.0, gap:.18, mul:1.5 }, { n:'叩きつけ', t:'circle', R:3.8, warn:1.2, mul:2.1, at:'front', fx:'slam' } ],
   nekomata:  [ { n:'爪の三連撃', t:'cone', R:2.8, arc:1.4, warn:.85, mul:1.3, rep:3, gap:.55 }, { n:'跳びかかり', t:'line', len:7, w:1.2, warn:.65, mul:1.6 } ],
   daitengu:  [ { n:'突風', t:'line', len:8.5, w:1.4, warn:.9, mul:1.5, rays:3, spread:.5 }, { n:'旋回', t:'sweep', len:4.6, w:.9, warn:.9, dur:1.2, mul:1.5 } ],
@@ -2281,8 +2285,8 @@ function updateProjs(dt){
         if (b.kind === 'arrow' && fxReady('arrowHit') && (G.arrowFx = (G.arrowFx || 0) + 1) % 2 === 1) fxAt('arrowHit', e.x, e.y, Math.atan2(b.vy, b.vx), 1.8 / FX.arrowHit.k, .24);   // 矢が当たる: 火花と、貫く光(混みすぎないよう、2回に1回)
         if (b.kind === 'kunai' && fxReady('kunaiHit') && (G.kuFx = (G.kuFx || 0) + 1) % 2 === 1) fxAt('kunaiHit', e.x, e.y, 0, 1.3 / FX.kunaiHit.k, .26);   // 苦無が当たる: 金属の火花(混みすぎないよう、2回に1回)
         if (b.kind === 'dart' && (G.daFx = (G.daFx || 0) + 1) % 2 === 1){   // 吹き矢が当たる: 最後の1体なら、小さな火花。まだ貫通できるなら、貫く光
-          if (b.hits > 1 && fxReady('dartPierce')) fxAt('dartPierce', e.x, e.y, Math.atan2(b.vy, b.vx), 1.5 / FX.dartPierce.k, .26);
-          else if (fxReady('dartHit')) fxAt('dartHit', e.x, e.y, 0, 1.0 / FX.dartHit.k, .24);
+          if (b.hits > 1 && fxReady('dartPierce')) fxAt('dartPierce', e.x, e.y, Math.atan2(b.vy, b.vx), .9 / FX.dartPierce.k, .26);
+          else if (fxReady('dartHit')) fxAt('dartHit', e.x, e.y, 0, .65 / FX.dartHit.k, .24);
         }
         if (b.kind === 'shuriken'){
           {
@@ -2300,7 +2304,7 @@ function updateProjs(dt){
     }
     if (dead){
       if (b.life <= 0 && (b.kind === 'kunai' || b.kind === 'dart')){   // 敵に当たらず、飛びきったら、地面に刺さって、消える
-        const id = b.kind === 'kunai' ? 'kunaiStuck' : 'dartStuck'; if (fxReady(id) && G.fx.length < 150) fxAt(id, b.x, b.y, 0, (b.kind === 'kunai' ? 1.0 : .8) / FX[id].k, .55);
+        const id = b.kind === 'kunai' ? 'kunaiStuck' : 'dartStuck'; if (fxReady(id) && G.fx.length < 150) fxAt(id, b.x, b.y, 0, (b.kind === 'kunai' ? 1.0 : .5) / FX[id].k, .55);
       }
       if (b.kind === 'fire' && b.guren){   // 蒼炎: 青い爆発と、着弾点の炎痕(地面に3秒残り、継続ダメージ)
         if (fxReady('gurenHit')) fxAt('gurenHit', b.x, b.y, 0, 1.2 / FX.gurenHit.k, .4);
@@ -3231,8 +3235,8 @@ function drawProj(b){
     const sw = 1.1 * U / FX.kunaiSpr.k; drawSpr('kunaiSpr', Math.floor(G.t * 12) % 6, x, y, a, sw, sw, 1); return;
   }
   if (b.kind === 'dart' && fxReady('dartSpr') && fxReady('dartTrail')){   // 吹き矢: うしろに、細い、白い光の筋
-    const tl = 1.8 * U / FX.dartTrail.k; drawSpr('dartTrail', Math.floor(G.t * 14 + b.y) % 6, x - Math.cos(a) * .2 * U, y - Math.sin(a) * .2 * U, a, tl, tl, .7);
-    const sw = .95 * U / FX.dartSpr.k; drawSpr('dartSpr', Math.floor(G.t * 12) % 6, x, y, a, sw, sw, 1); return;
+    const tl = 1.0 * U / FX.dartTrail.k; drawSpr('dartTrail', Math.floor(G.t * 14 + b.y) % 6, x - Math.cos(a) * .2 * U, y - Math.sin(a) * .2 * U, a, tl, tl, .7);
+    const sw = .55 * U / FX.dartSpr.k; drawSpr('dartSpr', Math.floor(G.t * 12) % 6, x, y, a, sw, sw, 1); return;
   }
   if (b.kind === 'arrow' && fxReady('arrowSpr') && fxReady('arrowTrail')){   // 矢: うしろに、光の筋。矢は、ドット絵
     const tl = 2.7 * U / FX.arrowTrail.k, ta = .85 * U / FX.arrowTrail.k * 0 + tl, al = .75;
@@ -4041,6 +4045,11 @@ function applyBgmVol(){
 }
 /* ================= 隠し: 背景の月を19回タップ → 月詠 ================= */
 let toastT = 0;
+let lockHintT = 0;
+function lockHint(text){
+  let el = $('lockHint'); if (!el){ el = document.createElement('div'); el.id = 'lockHint'; document.body.appendChild(el); }
+  el.textContent = text; el.classList.add('show'); clearTimeout(lockHintT); lockHintT = setTimeout(() => el.classList.remove('show'), 3000);
+}
 function toast(text){
   const el = $('toast'); el.textContent = text; el.className = ''; void el.offsetWidth; el.className = 'show';
 }
@@ -4070,14 +4079,14 @@ const MAPS = [
 ];
 const CHARS = [
   { id:'samurai', name:'侍', weapon:'odachi', spell:null, trait:'全体ダメージ+5%', ch:{ wd:1.05, sd:1.05 } },
-  { id:'ronin', name:'浪人', weapon:'yari', spell:null, trait:'最大HP+20%。HPが減るほど、武器・妖術の攻撃力が上がる(HPが1%減るごとに攻撃+1%。最大+75%)', unlock:0, ch:{ hp:1.2, low:1 } },
+  { id:'ronin', name:'浪人', weapon:'yari', spell:null, trait:'最大HP+20%。HPが減るほど、全ダメージが上がる(HPが1%減るごとに全ダメージ+1%。最大+75%)', unlock:0, ch:{ hp:1.2, low:1 } },
   { id:'musha', name:'女武芸者', weapon:'naginata', spell:'kawarimi', trait:'攻撃範囲+15%。手前に当たらない薙刀を変わり身の術で補う', unlock:1, ch:{ area:1.15 } },
   { id:'ninja', name:'忍者', weapon:'shuriken', weapons:['shuriken', 'makibishi'], spell:null, trait:'移動速度+10%。妖術のCT-15%', unlock:2, ch:{ spd:1.1, scd:.85 } },
   { id:'onmyo', name:'陰陽師', weapon:'fukiya', spell:'katon', trait:'妖術ダメージ+25%、武器ダメージ-15%。レベルアップのとき、妖術が、少し出やすい', unlock:3, ch:{ sd:1.25, wd:.85, spellBias:.5 } },
-  { id:'ochimusha', name:'落武者', weapon:'nagamaki', spell:'hyoui', trait:'倒れても1度だけ最大HPの50%で復活する(復活後3秒は無敵)。被ダメージ-15%、最大HP+10%', hire:true, price:1500, ch:{ revive:.5, taken:.85, hp:1.1 } },
+  { id:'ochimusha', name:'落武者', weapon:'nagamaki', spell:'hyoui', trait:'倒れても1度だけ最大HPの50%で復活する(復活後3秒は無敵)。被ダメージ-15%、憑依のCT-99%', hire:true, price:1500, ch:{ revive:.5, taken:.85, hcd:.01 } },
   { id:'kunoichi', name:'くのいち', weapon:'kunai', spell:null, trait:'無敵時間+0.3秒、移動速度+15%、全武器のCT-10%', hire:true, price:3000, ch:{ inv:.3, spd:1.15, wcd:.9 } },
   { id:'shogun', name:'将軍', weapon:'daikyu', spell:null, trait:'残魂の獲得量+25%、全武器・全妖術の範囲+15%、全ダメージ+8%、最大HP+10%', hire:true, price:8000, ch:{ soul:1.25, area:1.15, wd:1.08, sd:1.08, hp:1.1 } },
-  { id:'haou', name:'覇王', weapon:'odachi', spell:'hyoui', trait:'全ダメージ+25%、最大HP+30%、全CT-10%、残魂の取得範囲+30%、移動速度+5%', hire:true, price:20000, ch:{ wd:1.25, sd:1.25, hp:1.3, pick:1.3, wcd:.9, scd:.9, spd:1.05 } },
+  { id:'haou', name:'覇王', weapon:'odachi', spell:'katon', trait:'全ダメージ+35%、最大HP+30%、全CT-10%、残魂の取得範囲+30%、移動速度+5%', hire:true, price:20000, ch:{ wd:1.35, sd:1.35, hp:1.3, pick:1.3, wcd:.9, scd:.9, spd:1.05 } },
   { id:'ryoshi', name:'猟師', weapon:'teppo', spell:null, trait:'遠い敵ほどダメージ最大+20%。最大HP-10%', unlock:4, ch:{ far:1, hp:.9 } },
   { id:'robo', name:'ロボ侍', weapon:'odachi', weapons:['odachi','kogatana','kusarigama'], spell:null, secret:['ochimusha','kunoichi','shogun','haou'], trait:'全武器の個数+2(攻撃が2回ぶん増える)。', cond:'強化の「雇用」で、落武者・くのいち・将軍・覇王の4人を、全員雇う', ch:{ extra:2 } },
   { id:'amaterasu', name:'天照大御神', weapon:'kusanagi', weapons:['kusanagi'], spell:'yata', armor:'yasakani', secretOffer:true, trait:'三種の神器(天叢雲剣・八咫鏡・八尺瓊勾玉)を携えて出陣する。', cond:'強化の「賽銭」を投げると、0.2%の確率で、現れる', ch:{} },
@@ -4543,8 +4552,8 @@ function renderOffer(box){
 function renderShop(){
   if (shopTab === 'offer' && !offerOpen()) shopTab = 'scroll';   // 賽銭は、解禁まで、選べない
   if (shopTab === 'antique' && !antiqueOpen()) shopTab = 'scroll';   // 骨董品屋は、集古録珍を買うまで、選べない
-  { const t = $('tAntique'), ok = antiqueOpen(); t.textContent = ok ? '骨董品屋' : '骨董品屋(未解禁)'; t.disabled = !ok; t.classList.toggle('lock', !ok); t.classList.toggle('on', shopTab === 'antique'); }
-  { const t = $('tOffer'), ok = offerOpen(); t.textContent = ok ? '賽銭' : '賽銭(未解禁)'; t.disabled = !ok; t.classList.toggle('lock', !ok); }
+  { const t = $('tAntique'), ok = antiqueOpen(); t.textContent = ok ? '骨董品屋' : '骨董品屋(未解禁)'; t.classList.toggle('lock', !ok); t.classList.toggle('on', shopTab === 'antique'); }
+  { const t = $('tOffer'), ok = offerOpen(); t.textContent = ok ? '賽銭' : '賽銭(未解禁)'; t.classList.toggle('lock', !ok); }
   applyShopBg();   // 背景の絵があるタブだけ、背景を出す
   $('wallet').textContent = '所持 小判 ' + META.koban + '枚' + (bu('shukoroku') ? ' ／ 勾玉 ' + META.antique.mag + '個' : '');
   $('tScroll').classList.toggle('on', shopTab === 'scroll'); $('tBase').classList.toggle('on', shopTab === 'base'); $('tSpecial').classList.toggle('on', shopTab === 'special'); $('tAlly').classList.toggle('on', shopTab === 'ally'); $('tOffer').classList.toggle('on', shopTab === 'offer');
@@ -4905,11 +4914,11 @@ $('mTitles').addEventListener('click', openTitles);
 $('tBack2').addEventListener('click', () => { $('titles').classList.add('hide'); $('title').classList.remove('hide'); refreshTitle(); });
 $('tAll').addEventListener('click', () => { for (const t of TITLES) if (!META.titles[t.id]) earnTitle(t); renderTitles(); });
 $('tScroll').addEventListener('click', () => { shopTab = 'scroll'; renderShop(); });
-$('tOffer').addEventListener('click', () => { if (!offerOpen()) return; shopTab = 'offer'; renderShop(); });
+$('tOffer').addEventListener('click', () => { if (!offerOpen()){ lockHint('解禁条件: 全てのマップを、ハード以上でクリアする'); return; } shopTab = 'offer'; renderShop(); });
 $('tBase').addEventListener('click', () => { shopTab = 'base'; renderShop(); });
 $('tSpecial').addEventListener('click', () => { shopTab = 'special'; renderShop(); });
 $('tAlly').addEventListener('click', () => { shopTab = 'ally'; renderShop(); });
-$('tAntique').addEventListener('click', () => { if (!antiqueOpen()) return; shopTab = 'antique'; renderShop(); });
+$('tAntique').addEventListener('click', () => { if (!antiqueOpen()){ lockHint('解禁条件: 「特殊」の強化で、「集古録珍」を買う'); return; } shopTab = 'antique'; renderShop(); });
 $('qdM10').addEventListener('click', () => setQty(+$('qdN').textContent - 10)); $('qdM1').addEventListener('click', () => setQty(+$('qdN').textContent - 1)); $('qdP1').addEventListener('click', () => setQty(+$('qdN').textContent + 1)); $('qdP10').addEventListener('click', () => setQty(+$('qdN').textContent + 10));
 $('amaAwake').addEventListener('click', closeAmaterasuAwake); $('amaAwake').addEventListener('pointerup', e => { e.stopPropagation(); });
 $('qdRange').addEventListener('input', () => setQty(+$('qdRange').value)); $('qdMax').addEventListener('click', () => setQty(qtyMax)); $('qdGo').addEventListener('click', qtyGo); $('qdCancel').addEventListener('click', () => $('qtyDlg').classList.add('hide'));
