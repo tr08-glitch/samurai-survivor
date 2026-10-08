@@ -182,6 +182,12 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 .csub{ margin:12px 2px 2px; font-family:var(--font-display); font-weight:800; font-size:14px; letter-spacing:.08em; color:var(--moon); }
 .csub .clnk{ font-family:var(--font-ui); font-weight:400; font-size:12px; letter-spacing:0; margin-left:.5em; }
 .credlink{ position:absolute; right:calc(12px + env(safe-area-inset-right,0px)); bottom:calc(10px + env(safe-area-inset-bottom,0px)); z-index:3; margin:0; padding:6px 14px; border:1px solid rgba(228,234,241,.3); border-radius:4px; background:rgba(13,18,33,.55); font-size:12px; color:var(--moon-dim); }
+/* 図鑑の敵一覧 */
+.dxsep{ margin:12px 2px 2px; padding-bottom:3px; border-bottom:1px solid rgba(216,180,90,.5); font-family:var(--font-display); font-weight:800; font-size:15px; letter-spacing:.2em; color:var(--kin); }
+.dxrow.en{ cursor:default; }
+.dxrow.en .ic{ flex:0 0 58px; height:58px; }
+.dxrow.en .ic img{ width:52px; height:52px; }
+.dxrow.en .st.mp{ font-size:11.5px; line-height:1.5; }
 #settings{ background:rgba(8,11,22,.8); }
 #settings h2{ font-family:var(--font-display); letter-spacing:.3em; margin:0 0 14px; }
 #setlist{ width:min(420px,92vw); margin-bottom:18px; }
@@ -507,7 +513,7 @@ html.rot #rotateHint{ display:flex; }
   <section id="dex" class="screen hide">
     <h2>図鑑</h2>
     <p class="sub" id="dexCount"></p>
-    <div class="tabs" id="dexTabs"><button data-k="w" class="on">武器</button><button data-k="s">妖術</button><button data-k="a">防具</button><button data-k="r">巻物</button><button data-k="x">奥義</button><button data-k="c">キャラ</button></div>
+    <div class="tabs" id="dexTabs"><button data-k="w" class="on">武器</button><button data-k="s">妖術</button><button data-k="a">防具</button><button data-k="r">巻物</button><button data-k="x">奥義</button><button data-k="c">キャラ</button><button data-k="e">敵</button></div>
     <div id="dexlist"></div>
     <div id="dexdetail" class="hide">
       <div class="dxHead"><b id="dxName"></b><span id="dxLv"></span></div>
@@ -706,7 +712,7 @@ const CFG = {
 
 /* ================= 永続データ(小判と恒久強化) ================= */
 function defSettings(){ return { bgm: 5, se: 5, bright: 5 }; }   // 音量は0〜10(5が基準の大きさ)、光度は1〜10(5が基準)
-function defStats(){ return { crits:0, kills:0, play:0, kobanAll:0, bestLv:1, endBest:0, endScore:0, spent:0, runs:0, maxW:{}, maxW8:{}, maxS:{}, maxA:{}, maxR:{}, arts:{} }; }
+function defStats(){ return { crits:0, kills:0, ek:{}, play:0, kobanAll:0, bestLv:1, endBest:0, endScore:0, spent:0, runs:0, maxW:{}, maxW8:{}, maxS:{}, maxA:{}, maxR:{}, arts:{} }; }
 /* 図鑑: 武器・妖術・防具・巻物ごとに、これまでに到達した、いちばん高いレベルを記録する。
    以前の保存データには、記録がないので、称号・前のゲーム・強化の記録から、わかる範囲で、補う */
 function normDex(m){
@@ -1409,6 +1415,7 @@ const GUREN_BURN = .25, GUREN_BURN_SEC = 3;   // 紅蓮地獄の燃焼: 与え�
 function kill(e){
   if (e.dead) return;
   e.dead = true; G.kills++; META.stats.kills++; metaDirty = true;
+  { const ek = META.stats.ek || (META.stats.ek = {}); ek[e.type] = (ek[e.type] || 0) + 1; }   // 図鑑の敵一覧: 敵の種類ごとの、累計撃破数
   if (G.mode === 'end') G.killScore = (G.killScore || 0) + hpMul();   // 百鬼夜行: 敵が強くなるほど、1体あたりの撃破スコアが上がる(1体 = そのときの、敵の体力倍率)
   const T = ET[e.type];
   for (const [tier, n, pr] of T.drop){
@@ -4656,6 +4663,7 @@ function renderDex(){
   if (dexSel){ list.classList.add('hide'); det.classList.remove('hide'); $('dexTabs').style.display = 'none'; renderDexDetail(dexSel.k, dexSel.id); return; }
   dexPreviewStop(); det.classList.add('hide'); list.classList.remove('hide'); $('dexTabs').style.display = '';
   list.innerHTML = '';
+  if (dexTab === 'e'){ renderEnemyDex(list); return; }
   for (const id of dexIds(dexTab)){
     const isC = dexTab === 'c', isX = dexTab === 'x', D = dexSrc(dexTab)[id], on = dexOn(dexTab, id), masked = !on, r = document.createElement('button');
     r.className = 'dxrow' + (isC ? ' ch' : '') + (on ? '' : ' un');
@@ -4667,6 +4675,39 @@ function renderDex(){
     r.addEventListener('click', () => { dexSel = { k: dexTab, id }; renderDex(); });
     list.appendChild(r);
   }
+  list.scrollTop = 0;
+}
+/* 図鑑の「敵」: 小敵 → 中敵 → 大敵 → ボスの順。それぞれの中は、最初に出るマップの順。名前・絵・累計撃破数・出てくるマップ */
+function enemyDexGroups(){
+  const bosses = new Set(MAPCFG.map(c => c.boss.type)), ids = Object.keys(ET).filter(id => id !== 'kin');
+  const maps = {}, first = {};
+  MAPCFG.forEach((c, i) => {
+    const set = new Set();
+    c.pool(30).forEach(w => set.add(w[0])); (c.band || []).forEach(t => set.add(t)); if (c.fire) set.add(c.fire);
+    [c.mini, c.mid, c.boss].forEach(sp => { set.add(sp.type); if (ET[sp.type].add) set.add(ET[sp.type].add); });
+    set.forEach(t => { (maps[t] = maps[t] || []).push(MAPS[i].name); if (first[t] === undefined) first[t] = i; });
+  });
+  const tier = id => bosses.has(id) ? 3 : (ET[id].boss ? 2 : (ET[id].mid ? 1 : 0));
+  const g = [[], [], [], []];
+  ids.forEach((id, o) => { if (maps[id]) g[tier(id)].push({ id, o }); });
+  g.forEach(a => a.sort((x, y) => (first[x.id] - first[y.id]) || (x.o - y.o)));
+  return g.map(a => a.map(x => ({ id: x.id, maps: maps[x.id] })));
+}
+function renderEnemyDex(list){
+  const names = ['小敵', '中敵', '大敵', 'ボス'], ek = META.stats.ek || {};
+  enemyDexGroups().forEach((arr, ti) => {
+    const h = document.createElement('div'); h.className = 'dxsep'; h.textContent = names[ti]; list.appendChild(h);
+    for (const { id, maps } of arr){
+      const r = document.createElement('div'); r.className = 'dxrow en';
+      r.innerHTML = '<div class="ic"></div><div><div class="nm"></div><div class="st"></div><div class="st mp"></div></div>';
+      const src = ENEMY_SRC[ENEMY_ALIAS[id] || id], ic = r.querySelector('.ic');
+      if (src){ const im = document.createElement('img'); im.src = src; im.alt = ''; im.draggable = false; ic.appendChild(im); } else ic.textContent = '？';
+      r.querySelector('.nm').textContent = ET[id].n;
+      r.querySelector('.st').textContent = '累計撃破数 ' + (ek[id] || 0).toLocaleString('ja-JP') + '体';
+      r.querySelector('.mp').textContent = '出現マップ:' + maps.join('・');
+      list.appendChild(r);
+    }
+  });
   list.scrollTop = 0;
 }
 function renderDexDetail(k, id){
