@@ -179,7 +179,9 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 #credlist a{ color:#9fd8ff; word-break:break-all; }
 .cnote{ margin:8px 2px 0; font-size:12px; line-height:1.7; color:var(--moon-dim); }
 .cnote.cend{ margin-top:20px; text-align:center; font-family:var(--font-display); font-size:14px; color:var(--moon); }
-.credlink{ margin:6px 0 0; padding:6px 14px; border:1px solid rgba(228,234,241,.3); border-radius:4px; background:rgba(13,18,33,.55); font-size:12px; color:var(--moon-dim); }
+.csub{ margin:12px 2px 2px; font-family:var(--font-display); font-weight:800; font-size:14px; letter-spacing:.08em; color:var(--moon); }
+.csub .clnk{ font-family:var(--font-ui); font-weight:400; font-size:12px; letter-spacing:0; margin-left:.5em; }
+.credlink{ position:absolute; right:calc(12px + env(safe-area-inset-right,0px)); bottom:calc(10px + env(safe-area-inset-bottom,0px)); z-index:3; margin:0; padding:6px 14px; border:1px solid rgba(228,234,241,.3); border-radius:4px; background:rgba(13,18,33,.55); font-size:12px; color:var(--moon-dim); }
 #settings{ background:rgba(8,11,22,.8); }
 #settings h2{ font-family:var(--font-display); letter-spacing:.3em; margin:0 0 14px; }
 #setlist{ width:min(420px,92vw); margin-bottom:18px; }
@@ -284,7 +286,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; -webkit-tap-highligh
 #title.tapwait #tapStart{ display:block; animation:fadeUp 1.1s ease-out .8s both; }
 #tapStart span{ font-family:var(--font-display); font-weight:800; font-size:22px; letter-spacing:.34em; padding-left:.34em; color:#f6edcf; text-shadow:0 0 14px rgba(255,220,130,.75), 0 2px 8px #000; animation:tapBlink 1.9s ease-in-out infinite; }
 @keyframes tapBlink{ 0%,100%{ opacity:.28 } 50%{ opacity:1 } }
-#title.tapwait .modebtn, #title.tapwait .ver{ visibility:hidden; animation:none !important; }
+#title.tapwait .modebtn, #title.tapwait .credlink, #title.tapwait .ver{ visibility:hidden; animation:none !important; }
 #title.tapgo #mRun{ animation-delay:.04s; } #title.tapgo #mEnd{ animation-delay:.16s; } #title.tapgo #mShop{ animation-delay:.28s; } #title.tapgo #mTitles{ animation-delay:.40s; } #title.tapgo #mDex{ animation-delay:.52s; } #title.tapgo .ver{ animation-delay:.8s; }
 .ver{ margin-top:clamp(8px,2vh,22px); font-size:11px; color:var(--moon-dim); text-align:center; line-height:1.7; max-width:340px; animation:fadeUp 1s ease-out .9s both; }
 @media (prefers-reduced-motion:reduce){ .logo,.logo img,.sub,.modebtn,.ver{ animation:none !important; } }
@@ -499,7 +501,7 @@ html.rot #rotateHint{ display:flex; }
     <button class="modebtn" id="mTitles">称号<small id="titlesSub">条件を満たすと、能力や新しい装備を得る</small></button>
     <button class="modebtn" id="mDex">図鑑<small id="dexSub">武器・妖術・防具・巻物・奥義・キャラの、記録を見る</small></button>
     <button class="credlink" id="bCred">クレジット</button>
-    <p class="ver">試作 v0.1 ／ 操作:画面をドラッグして移動(PCは WASD・矢印キー)。攻撃は自動。<br>キャラは侍(大太刀)のみ。</p>
+    <p class="ver">試作 v0.1 ／ 操作:画面をドラッグして移動(PCは WASD・矢印キー)。攻撃は自動。</p>
   </section>
 
   <section id="dex" class="screen hide">
@@ -579,18 +581,21 @@ html.rot #rotateHint{ display:flex; }
       </ul>
       <p class="cnote">いずれもフリーBGMとして公開されている曲を、ゲームに合わせて切り出して使っています。</p>
       <div class="cgrp">効果音</div>
-      <p class="cnote" style="margin:0 2px 4px">効果音ラボ&nbsp;<a href="https://soundeffect-lab.info/sound/button/" target="_blank" rel="noopener noreferrer">soundeffect-lab.info</a><br>On-Jin〜音人〜&nbsp;<a href="https://on-jin.com/sound/index.php?kensaku=%E9%88%B4" target="_blank" rel="noopener noreferrer">on-jin.com</a>(鈴の音・賽銭の音)</p>
+      <p class="csub">効果音ラボ <span class="clnk"><a href="https://soundeffect-lab.info/sound/button/" target="_blank" rel="noopener noreferrer">soundeffect-lab.info</a></span></p>
       <ul class="cl">
-        <li><b>賽銭の音</b>sei_ge_jinja_suzu02<br><span>On-Jin〜音人〜</span></li>
-        <li><b>鈴の音</b>ジングルベル01<br><span>On-Jin〜音人〜</span></li>
         <li><b>残魂を拾う音</b>カーソル移動9</li>
         <li><b>ボタンを押す音</b>決定ボタンを押す50</li>
         <li><b>おにぎりを拾う音</b>ゲージ回復2</li>
         <li><b>火遁</b>火炎魔法1</li>
         <li><b>風遁</b>風魔法2</li>
         <li><b>月光</b>オーラ1</li>
-        <li><b>水遁</b>VSQSE_0799_Ukiha_Tsuzura_Tanada_02<br><span>効果音ラボ</span></li>
+        <li><b>水遁</b>VSQSE_0799_Ukiha_Tsuzura_Tanada_02</li>
         <li><b>勾玉の効果中の音</b>ゲージ回復1(加工)</li>
+      </ul>
+      <p class="csub">On-Jin〜音人〜 <span class="clnk"><a href="https://on-jin.com/sound/index.php?kensaku=%E9%88%B4" target="_blank" rel="noopener noreferrer">on-jin.com</a></span></p>
+      <ul class="cl">
+        <li><b>賽銭の音</b>sei_ge_jinja_suzu02</li>
+        <li><b>鈴の音</b>ジングルベル01</li>
       </ul>
       <p class="cnote">武器・妖術の効果音(大太刀・草薙剣・小刀・薙刀・長巻・槍・火縄銃・弓・吹き矢・手裏剣・撒菱・苦無・鎖鎌・憑依・八咫鏡・蒼炎・変わり身 など)は、作者がプログラムで作成しました。上の効果音は、一部を加工して使っています。</p>
       <div class="cgrp">画像</div>
@@ -4994,7 +4999,7 @@ function tapStartGo(){
 if (!G){
   $('title').classList.add('tapwait'); document.addEventListener('pointerdown', tapStartGo, true); document.addEventListener('keydown', tapStartGo, true);
   // 最初のタップ(の、離す・クリック)は、メニューを出すだけ。ボタンには、届かせない(設定ボタンだけは、そのまま押せる)
-  for (const ev of ['click', 'pointerup', 'touchend', 'mouseup']) document.addEventListener(ev, e => { if (performance.now() < tapGuardUntil && e.target.closest && e.target.closest('#title .modebtn')){ e.stopPropagation(); e.preventDefault(); } }, true);
+  for (const ev of ['click', 'pointerup', 'touchend', 'mouseup']) document.addEventListener(ev, e => { if (performance.now() < tapGuardUntil && e.target.closest && e.target.closest('#title .modebtn, #title .credlink')){ e.stopPropagation(); e.preventDefault(); } }, true);
 }
 requestAnimationFrame(frame);
 window.__ssAlive = true;   // ゲームの本体が、最後まで読み込まれた印
